@@ -1,5 +1,11 @@
 const Sequelize = require('sequelize');
 const Usuarios = require('../models').Usuarios;
+var bcrypt = require('bcryptjs');
+const {query, validationResult, body} = require('express-validator');
+const {buildResponse, errorResponse} = require("../utils/Utils");
+const jwt = require("jsonwebtoken");
+const {jwtSecret, jwtPrivateKey} = require("../config/sec");
+const fs = require("fs");
 
 module.exports = {
     async create(req, res) {
@@ -8,6 +14,9 @@ module.exports = {
         var user = await Usuarios.findOne({
             where: {email: values.email}
         })
+
+        var hash = bcrypt.hashSync(values.password, 10);
+
         if (user !== null) {
             res.status(400).send({error: 'Ya existe un usuario registrado con ese email.'})
         } else {
@@ -18,19 +27,58 @@ module.exports = {
                     email: values.email,
                     telefono: values.telefono,
                     usuario: values.usuario,
-                    clave: values.clave
+                    clave: hash
                 })
-                .then(Usuarios => res.status(200).send(Usuarios))
-                .catch(error => res.status(400).send(error))
+                .then(Usuarios => res.status(200).send(buildResponse(Usuarios)))
+                .catch(error => res.status(400).send(errorResponse(error)))
         }
     },
     list(req, res) {
         return Usuarios.findAll()
-            .then(Usuarios => res.status(200).send(Usuarios))
-            .catch(error => res.status(400).send(error))
+            .then(Usuarios => res.status(200).send(buildResponse(Usuarios)))
+            .catch(error => res.status(400).send(errorResponse(error)))
     },
 
     find(req, res) {
 
+    },
+
+    async login(req, res) {
+        let values = req.body;
+
+        if (values.email !== undefined && values.password !== undefined) {
+            var user = await Usuarios.findOne({
+                where: {email: values.email}
+            })
+
+            if (user === null) {
+                res.status(500).send(errorResponse('Usuario o contraseña no encontrados'))
+            } else {
+                bcrypt.compare(values.password, user.clave, function (err, result) {
+                    if (err) {
+                        res.status(500).send(errorResponse(err));
+                    }
+                    if (result) {
+                        user.clave = null;
+                        jwt.sign({
+                            user: user.id,
+                            email: user.email,
+                        }, jwtSecret, {expiresIn: '1d'}, function (err, token) {
+                            if (err) {
+                                res.clearCookie('tk')
+                                res.status(500).json(errorResponse(err.toString()));
+                            } else {
+                                res.cookie('tk', token, {httpOnly: true});
+                                res.status(200).send(buildResponse(null, 'Usuario identificado correctamente.'));
+                            }
+                        });
+                    } else {
+                        res.status(500).json(errorResponse('Contraseña invalida'));
+                    }
+                });
+            }
+        } else {
+            res.status(500).send(errorResponse('Faltan datos obligatorios'));
+        }
     },
 };
