@@ -91,12 +91,37 @@ module.exports = {
         if (req.cookies.tk === undefined) {
             res.status(403).send(errorResponse('No iniciaste sesión'))
         } else {
-            jwt.verify(req.cookies.tk, jwtSecret, null, function (err, token) {
+            jwt.verify(req.cookies.tk, jwtSecret, null, (err, token) => {
                 if (err) {
                     res.clearCookie('tk')
                     res.status(500).json(errorResponse(err.toString()));
                 } else {
                     res.status(200).send(buildResponse(null, 'Usuario identificado correctamente.'));
+                }
+            });
+        }
+    },
+
+    async getLoggedAccountData(req, res) {
+        if (req.cookies.tk === undefined) {
+            res.status(403).send(errorResponse('No iniciaste sesión'))
+        } else {
+            jwt.verify(req.cookies.tk, jwtSecret, null, (err, token) => {
+                if (err) {
+                    res.clearCookie('tk')
+                    res.status(500).json(errorResponse(err.toString()));
+                } else {
+                    Usuarios.findOne({
+                        where: {
+                            id: token.user
+                        }
+                    }).then(Usuario => {
+                        Usuario.dataValues.clave = null;
+                        res.status(200).send(buildResponse(Usuario.dataValues, 'Consultado correctamente'));
+                    })
+                        .catch(error => {
+                            res.status(500).json(errorResponse(error.toString()));
+                        });
                 }
             });
         }

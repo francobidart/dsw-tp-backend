@@ -16,14 +16,15 @@ app.use(cookieParser());
 
 var whitelist = ['http://localhost:4200']
 var corsOptions = {
-  credentials: true,
-  origin: function(origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
+    credentials: true,
+    origin: function (origin, callback) {
+        if (whitelist.indexOf(origin) !== -1) {
+            callback(null, true)
+        } else {
+            callback(null, true)
+            //callback(new Error('Not allowed by CORS'))
+        }
     }
-  }
 }
 
 
@@ -50,6 +51,8 @@ app.get('/categories/:id/products', productoController.findByCat);
 app.get('/users', authenticateToken, usuarioController.list);
 
 app.get('/session/validateSession', usuarioController.validateSession);
+app.get('/account/profile', usuarioController.getLoggedAccountData);
+
 app.get('/logout', usuarioController.logout)
 app.post('/login', usuarioController.login);
 app.post('/usuarios', usuarioController.create);
