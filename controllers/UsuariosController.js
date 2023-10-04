@@ -81,4 +81,24 @@ module.exports = {
             res.status(500).send(errorResponse('Faltan datos obligatorios'));
         }
     },
+
+    async logout(req, res) {
+        res.clearCookie('tk')
+        res.status(200).send(buildResponse('Sesión finalizada correctamente.'))
+    },
+
+    async validateSession(req, res) {
+        if (req.cookies.tk === undefined) {
+            res.status(403).send(errorResponse('No iniciaste sesión'))
+        } else {
+            jwt.verify(req.cookies.tk, jwtSecret, null, function (err, token) {
+                if (err) {
+                    res.clearCookie('tk')
+                    res.status(500).json(errorResponse(err.toString()));
+                } else {
+                    res.status(200).send(buildResponse(null, 'Usuario identificado correctamente.'));
+                }
+            });
+        }
+    }
 };

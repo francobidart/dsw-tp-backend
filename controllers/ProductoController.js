@@ -18,7 +18,7 @@ module.exports = {
     },
     list(req, res) {
         let page = req.query.page ? req.query.page : 0;
-        let limit = 10000;
+        let limit = req.query.limit ? parseInt(req.query.limit) : 10000;
         let offset = page * limit;
         return Producto.findAndCountAll({
             limit: limit,
@@ -52,7 +52,7 @@ module.exports = {
                 id: req.params.id,
             }
         })
-            .then(Producto => res.status(200).send(Producto))
+            .then(Producto => res.status(200).send(buildResponse(Producto)))
             .catch(error => res.status(400).send(error))
     },
 };

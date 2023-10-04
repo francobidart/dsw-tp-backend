@@ -14,11 +14,20 @@ var cors = require('cors')
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
+var whitelist = ['http://localhost:4200']
+var corsOptions = {
+  credentials: true,
+  origin: function(origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}
+
+
+app.use(cors(corsOptions))
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -31,7 +40,7 @@ app.get('/', productoController.list)
 
 // Productos
 app.get('/products/', productoController.list);
-app.get('/products/:id', productoController.list);
+app.get('/products/:id', productoController.find);
 
 // Categorías
 app.get('/categories/', tipoProductoController.list);
@@ -40,6 +49,8 @@ app.get('/categories/:id/products', productoController.findByCat);
 
 app.get('/users', authenticateToken, usuarioController.list);
 
+app.get('/session/validateSession', usuarioController.validateSession);
+app.get('/logout', usuarioController.logout)
 app.post('/login', usuarioController.login);
 app.post('/usuarios', usuarioController.create);
 
