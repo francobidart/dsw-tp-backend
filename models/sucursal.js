@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
          * The `models/index` file will call this method automatically.
          */
         static associate(models) {
-         
+
         }
     }
 
@@ -25,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
         telefono: DataTypes.STRING,
     }, {
         sequelize,
+        tableName: 'sucursales',
         modelName: 'Sucursal',
     });
     return Sucursal;

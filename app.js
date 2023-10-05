@@ -14,6 +14,7 @@ var cors = require('cors')
 const cookieParser = require('cookie-parser');
 const mediopago = require('./models/mediopago');
 const MedioPagoController = require('./controllers/MedioPagoController');
+const SucursalController = require('./controllers/SucursalController')
 app.use(cookieParser());
 
 var whitelist = ['http://localhost:4200']
@@ -62,6 +63,7 @@ app.post('/usuarios', usuarioController.create);
 // Medio Pago
 app.get('/mediopago/', MedioPagoController.list);
 app.get('/mediopago/:tag', MedioPagoController.find);
+app.get('/sucursal/', SucursalController.list)
 
 
 
