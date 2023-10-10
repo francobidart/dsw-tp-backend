@@ -14,7 +14,9 @@ var cors = require('cors')
 const cookieParser = require('cookie-parser');
 const mediopago = require('./models/mediopago');
 const MedioPagoController = require('./controllers/MedioPagoController');
-const SucursalController = require('./controllers/SucursalController')
+const SucursalController = require('./controllers/SucursalController');
+const PedidosController = require('./controllers/PedidosController');
+
 app.use(cookieParser());
 
 var whitelist = ['http://localhost:4200']
@@ -65,7 +67,7 @@ app.get('/mediopago/', MedioPagoController.list);
 app.get('/mediopago/:tag', MedioPagoController.find);
 app.get('/sucursal/', SucursalController.list)
 
-
+app.get('/pedidos', PedidosController.list)
 
 app.get('*', function (req, res) {
     res.status(404).send(errorResponse('404 - Not Found'));
