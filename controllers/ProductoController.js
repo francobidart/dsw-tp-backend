@@ -3,6 +3,7 @@ const {errorResponse, buildResponse} = require("../utils/Utils");
 const {Op} = require("sequelize");
 const TipoProducto = require('../models').TipoProducto;
 const Producto = require('../models').Producto;
+const {sequelize} = require('../models');
 
 module.exports = {
     create(req, res) {
@@ -32,13 +33,23 @@ module.exports = {
     },
     findByCat(req, res) {
         let page = req.query.page ? req.query.page : 0;
+        let order = req.query.order ? req.query.order : null;
+        let orderArray = ['nombre', 'ASC'];
+        if (order) {
+            if (order === 'Ascendente') {
+                orderArray = ['precio', 'ASC']
+            } else {
+                orderArray = ['precio', 'DESC']
+            }
+        }
         let limit = 10000;
         let categoria = req.params.id;
         let offset = page * limit;
         return Producto.findAndCountAll({
             limit: limit,
             offset: offset,
-            where: {categoria: categoria, stock: { [Op.gt]: 0 }},
+            where: {categoria: categoria, stock: {[Op.gt]: 0}},
+            order: [orderArray],
             include: {
                 model: TipoProducto
             }

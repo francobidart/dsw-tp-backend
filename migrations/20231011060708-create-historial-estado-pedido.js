@@ -2,42 +2,26 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await queryInterface.createTable('DetallePedidos', {
+        await queryInterface.createTable('HistorialEstadoPedidos', {
             id: {
                 allowNull: false,
                 autoIncrement: true,
                 primaryKey: true,
                 type: Sequelize.INTEGER
             },
-            articulo: {
-                allowNull: false,
-                type: Sequelize.INTEGER,
-                references: {
-                    model: 'Productos',
-                    key: 'id'
-                }
-            },
-            detalle: {
-                allowNull: true,
-                type: Sequelize.STRING
-            },
-            cantidad: {
-                allowNull: false,
-                type: Sequelize.FLOAT
-            },
-            precioUnitario: {
-                allowNull: false,
-                type: Sequelize.FLOAT
-            },
-            montoTotal: {
-                allowNull: false,
-                type: Sequelize.FLOAT
-            },
             pedido: {
                 allowNull: false,
                 type: Sequelize.INTEGER,
                 references: {
                     model: 'Pedidos',
+                    key: 'id'
+                }
+            },
+            estado: {
+                allowNull: false,
+                type: Sequelize.INTEGER,
+                references: {
+                    model: 'EstadoPedidos',
                     key: 'id'
                 }
             },
@@ -52,6 +36,6 @@ module.exports = {
         });
     },
     async down(queryInterface, Sequelize) {
-        await queryInterface.dropTable('DetallePedidos');
+        await queryInterface.dropTable('HistorialEstadoPedidos');
     }
 };

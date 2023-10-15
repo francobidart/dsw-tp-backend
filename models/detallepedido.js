@@ -13,19 +13,38 @@ module.exports = (sequelize, DataTypes) => {
             this.belongsTo(models.Pedido, {
                 foreignKey: 'pedido'
             });
-            this.hasOne(models.Producto, {
-                foreignKey: 'id',
+            this.belongsTo(models.Producto, {
+                foreignKey: 'articulo',
                 as: 'detalleArticulo'
             })
         }
     }
 
     DetallePedido.init({
-        articulo: DataTypes.INTEGER,
-        cantidad: DataTypes.FLOAT,
-        precioUnitario: DataTypes.FLOAT,
-        montoTotal: DataTypes.FLOAT,
-        pedido: DataTypes.INTEGER
+        articulo: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        detalle: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        cantidad: {
+            type: DataTypes.FLOAT,
+            allowNull: false
+        },
+        precioUnitario: {
+            type: DataTypes.FLOAT,
+            allowNull: false
+        },
+        montoTotal: {
+            type: DataTypes.FLOAT,
+            allowNull: false
+        },
+        pedido: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        }
     }, {
         sequelize,
         modelName: 'DetallePedido',

@@ -28,7 +28,12 @@ module.exports = (sequelize, DataTypes) => {
         imagen: DataTypes.STRING,
         nombre: DataTypes.STRING,
         descripcion: DataTypes.STRING,
-        stock: DataTypes.FLOAT
+        stock: {
+            type: DataTypes.FLOAT,
+            validate: {
+                isNumeric: true
+            }
+        }
     }, {
         sequelize,
         modelName: 'Producto',

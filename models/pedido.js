@@ -15,6 +15,14 @@ module.exports = (sequelize, DataTypes) => {
                 foreignKey: 'pedido',
                 onDelete: 'RESTRICT'
             })
+            this.belongsTo(models.EstadoPedido, {
+                foreignKey: 'id',
+                as: 'detalleEstadoActual'
+            })
+            this.hasMany(models.HistorialEstadoPedido, {
+                foreignKey: 'pedido',
+                as: 'historialEstadoPedido'
+            })
             this.belongsTo(models.Usuarios, {
                 targetKey: 'id',
                 as: 'clientePedido',
@@ -30,9 +38,19 @@ module.exports = (sequelize, DataTypes) => {
             autoIncrement: true,
             primaryKey: true
         },
-        montoTotal: DataTypes.FLOAT,
-        estadoActual: DataTypes.INTEGER,
-        cliente: DataTypes.INTEGER
+        montoTotal: {
+            type: DataTypes.FLOAT,
+            allowNull: false
+        },
+        estadoActual: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 1
+        },
+        cliente: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        }
     }, {
         sequelize,
         modelName: 'Pedido',

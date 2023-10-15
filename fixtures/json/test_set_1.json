@@ -1,0 +1,162 @@
+[
+  {
+    "model": "Usuarios",
+    "data": {
+      "nombre": "Juan Carlos",
+      "apellido": "Bodoque",
+      "email": "test@test.com",
+      "usuario": "juancarlos",
+      "clave": "$2a$12$TTk.q4Gez2E1WqDVV9SSd.9Lxdd4jMo6Fs8ngYmnodQb5lAz7iEAe",
+      "telefono": "3410000000",
+      "isAdmin": 0
+    }
+  },
+  {
+    "model": "TipoProducto",
+    "data": {
+      "id": 1,
+      "nombre": "Procesadores"
+    }
+  },
+  {
+    "model": "TipoProducto",
+    "data": {
+      "id": 2,
+      "nombre": "Placas de video"
+    }
+  },
+  {
+    "model": "TipoProducto",
+    "data": {
+      "id": 3,
+      "nombre": "Discos solidos"
+    }
+  },
+  {
+    "model": "TipoProducto",
+    "data": {
+      "id": 4,
+      "nombre": "Memorias RAM"
+    }
+  },
+  {
+    "model": "TipoProducto",
+    "data": {
+      "id": 5,
+      "nombre": "Otros"
+    }
+  },
+  {
+    "model": "MedioPago",
+    "data": {
+      "id": 1,
+      "tag": "efectivo",
+      "nombre": "Pago en efectivo"
+    }
+  },
+  {
+    "model": "MedioPago",
+    "data": {
+      "id": 2,
+      "tag": "mercado_pago",
+      "nombre": "Mercado Pago"
+    }
+  },
+  {
+    "model": "Producto",
+    "data": {
+      "id": 1,
+      "categoria": 3,
+      "precio": 15029,
+      "nombre": "DISCO SOLIDO SSD LEXAR 1TB SL200 EXTERNO",
+      "stock": 10,
+      "imagen": "https://www.venex.com.ar/products_images/1689616133_4.png"
+    }
+  },
+  {
+    "model": "Producto",
+    "data": {
+      "id": 2,
+      "categoria": 2,
+      "precio": 240500,
+      "nombre": "PLACA DE VIDEO NVIDIA GEFORCE GTX 1650 OC 4G PHOENIX GDDR6",
+      "stock": 10,
+      "imagen": "https://www.venex.com.ar/products_images/1686052397_4.jpg"
+    }
+  },
+  {
+    "model": "Producto",
+    "data": {
+      "id": 3,
+      "categoria": 5,
+      "precio": 45000,
+      "nombre": "TECLADO REDRAGON K630 DRAGONBORN BLACK 60 MECANICO",
+      "stock": 10,
+      "imagen": "https://www.venex.com.ar/products_images/1622142628_k630rgb-pngweb-10-1.png"
+    }
+  },
+  {
+    "model": "Producto",
+    "data": {
+      "id": 4,
+      "categoria": 1,
+      "precio": 124029,
+      "nombre": "MICROPROCESADOR INTEL CELERON G5905 TRAY OEM BULK 3.50GHZ 4MB 1200",
+      "stock": 10,
+      "imagen": "https://www.venex.com.ar/products_images/1641988097_5905.png"
+    }
+  },
+  {
+    "model": "Sucursal",
+    "data": {
+      "id": 1,
+      "nombre": "Centro",
+      "direccion": "Zeballos 1341 | Rosario | Santa Fe",
+      "telefono": "341000010"
+    }
+  },
+  {
+    "model": "Sucursal",
+    "data": {
+      "id": 2,
+      "nombre": "Norte",
+      "direccion": "Thedy 100 | Rosario | Santa Fe",
+      "telefono": "341000010"
+    }
+  },
+  {
+    "model": "EstadoPedido",
+    "data": {
+      "id": 1,
+      "nombre": "Generado"
+    }
+  },
+  {
+    "model": "EstadoPedido",
+    "data": {
+      "id": 2,
+      "nombre": "Pendiente de pago"
+    }
+  },
+  {
+    "model": "EstadoPedido",
+    "data": {
+      "id": 3,
+      "nombre": "Cobrado (pendiente de entrega)"
+    }
+  },
+  {
+    "model": "EstadoPedido",
+    "data": {
+      "id": 4,
+      "nombre": "Entregado"
+    }
+  },
+  {
+    "model": "EstadoPedido",
+    "data": {
+      "id": 5,
+      "nombre": "Cancelado"
+    }
+  }
+]

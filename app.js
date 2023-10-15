@@ -8,7 +8,7 @@ const port = 3000
 var bodyParser = require('body-parser');
 var multer = require('multer');
 const {query, body} = require("express-validator");
-const {errorResponse, authenticateToken} = require("./utils/Utils");
+const {errorResponse, authenticateToken, authenticateAdmin} = require("./utils/Utils");
 var forms = multer();
 var cors = require('cors')
 const cookieParser = require('cookie-parser');
@@ -42,7 +42,7 @@ app.use(forms.array());
 
 app.use(express.json());
 
-app.get('/', productoController.list)
+app.get('/', authenticateAdmin, productoController.list)
 
 // Productos
 app.get('/products/', productoController.list);
@@ -65,9 +65,12 @@ app.post('/usuarios', usuarioController.create);
 // Medio Pago
 app.get('/mediopago/', MedioPagoController.list);
 app.get('/mediopago/:tag', MedioPagoController.find);
-app.get('/sucursal/', SucursalController.list)
+app.get('/sucursales/', SucursalController.list)
 
-app.get('/pedidos', PedidosController.list)
+app.get('/pedidos', PedidosController.list);
+app.get('/pedidos/:id', authenticateToken, PedidosController.getById);
+
+app.post('/pedidos/registrar', authenticateToken, PedidosController.create)
 
 app.get('*', function (req, res) {
     res.status(404).send(errorResponse('404 - Not Found'));

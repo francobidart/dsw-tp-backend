@@ -63,6 +63,7 @@ module.exports = {
                         jwt.sign({
                             user: user.id,
                             email: user.email,
+                            isAdmin: user.isAdmin
                         }, jwtSecret, {expiresIn: '1d'}, function (err, token) {
                             if (err) {
                                 res.clearCookie('tk')
@@ -91,12 +92,23 @@ module.exports = {
         if (req.cookies.tk === undefined) {
             res.status(403).send(errorResponse('No iniciaste sesión'))
         } else {
-            jwt.verify(req.cookies.tk, jwtSecret, null, (err, token) => {
+            jwt.verify(req.cookies.tk, jwtSecret, null, async (err, token) => {
+                const user = await Usuarios.findOne({
+                    where: {
+                        id: token.user
+                    },
+                    attributes: ['isAdmin']
+                });
                 if (err) {
                     res.clearCookie('tk')
                     res.status(500).json(errorResponse(err.toString()));
                 } else {
-                    res.status(200).send(buildResponse(null, 'Usuario identificado correctamente.'));
+                    if (user) {
+                        res.status(200).send(buildResponse({isAdmin: user.isAdmin}, 'Usuario identificado correctamente.'));
+                    } else {
+                        res.clearCookie('tk')
+                        res.status(500).json(errorResponse('No autorizado'));
+                    }
                 }
             });
         }
