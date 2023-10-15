@@ -83,3 +83,27 @@ app.post('*', function (req, res) {
 app.listen(port, () => {
     console.log(`DSW TP Backend se está ejecutando en el puerto ${port}`)
 })
+
+
+app.use(bodyParser.json());
+
+const db = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: '1234',
+  database: 'tp_dsw',
+});
+
+app.get('/api/buscar', (req, res) => {
+  const searchTerm = req.query.q;
+  const query = `SELECT * FROM tu_tabla WHERE descripcion LIKE '%${searchTerm}%'`;
+  
+  db.query(query, (error, results) => {
+    if (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Error en la búsqueda' });
+    }
+    
+    res.json(results);
+  });
+});
