@@ -104,3 +104,18 @@ app.get('/api/buscar', (req, res) => {
     res.json(results);
   });
 });
+
+
+app.get('/api/micuenta', (req, res) => {
+  const userId = req.user.id; 
+  const query = `SELECT nombre, apellido, email, usuario, telefono FROM clientes WHERE id = ?`;
+  
+  db.query(query, [userId], (error, results) => {
+    if (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Error al obtener el perfil del usuario' });
+    }
+    
+    res.json(results[0]);
+  });
+});
