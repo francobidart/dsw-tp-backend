@@ -46,8 +46,8 @@ app.get('/', authenticateAdmin, productoController.list)
 
 // Productos
 app.get('/products/', productoController.list);
+app.get('/products/search/', productoController.search);
 app.get('/products/:id', productoController.find);
-
 // Categorías
 app.get('/categories/', tipoProductoController.list);
 app.get('/categories/:id', tipoProductoController.find);
@@ -56,6 +56,7 @@ app.get('/categories/:id/products', productoController.findByCat);
 app.get('/users', authenticateToken, usuarioController.list);
 
 app.get('/session/validateSession', usuarioController.validateSession);
+app.get('/session/validateAdmin', usuarioController.validateAdmin);
 app.get('/account/profile', usuarioController.getLoggedAccountData);
 
 app.get('/logout', usuarioController.logout)
@@ -67,10 +68,16 @@ app.get('/mediopago/', MedioPagoController.list);
 app.get('/mediopago/:tag', MedioPagoController.find);
 app.get('/sucursales/', SucursalController.list)
 
-app.get('/pedidos', PedidosController.list);
+app.get('/pedidos', authenticateToken, PedidosController.list);
 app.get('/pedidos/:id', authenticateToken, PedidosController.getById);
 
 app.post('/pedidos/registrar', authenticateToken, PedidosController.create)
+
+// MODULO ADMINSTRADOR
+// Todos estos endpoints requieren autenticación superior, utilizar authenticateAdmin
+
+app.get('/clientes', authenticateAdmin, usuarioController.list)
+app.get('/clientes/:id', authenticateAdmin, usuarioController.find)
 
 app.get('*', function (req, res) {
     res.status(404).send(errorResponse('404 - Not Found'));
@@ -87,6 +94,7 @@ app.listen(port, () => {
 
 app.use(bodyParser.json());
 
+/*
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
@@ -107,3 +115,5 @@ app.get('/api/buscar', (req, res) => {
     res.json(results);
   });
 });
+
+ */

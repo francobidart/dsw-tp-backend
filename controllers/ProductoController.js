@@ -66,4 +66,17 @@ module.exports = {
             .then(Producto => res.status(200).send(buildResponse(Producto)))
             .catch(error => res.status(400).send(error))
     },
+
+    search(req, res) {
+        const searchTerm = req.query.q;
+        return Producto.findAll({
+            where: {
+                nombre: {
+                    [Op.like]: '%' + searchTerm + '%'
+                }
+            }
+        })
+            .then(Producto => res.status(200).send(buildResponse(Producto)))
+            .catch(error => res.status(400).send(error))
+    },
 };

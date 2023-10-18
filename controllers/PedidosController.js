@@ -118,9 +118,17 @@ module.exports = {
         let page = req.query.page ? req.query.page : 0;
         let limit = req.query.limit ? parseInt(req.query.limit) : 10000;
         let offset = page * limit;
+        let whereSettings = {}
+        if(!res.locals.isAdmin) {
+            whereSettings = {
+                cliente: res.locals.user
+            }
+        }
+        console.log(whereSettings)
         return Pedido.findAndCountAll({
             limit: limit,
             offset: offset,
+            where: whereSettings,
             include: [
                 {
                     model: DetallePedido,
@@ -143,6 +151,7 @@ module.exports = {
             .then(Pedido => res.status(200).send(buildResponse(Pedido.rows)))
             .catch(error => res.status(400).send(errorResponse(error)))
     },
+
     findByCat(req, res) {
         let page = req.query.page ? req.query.page : 0;
         let limit = 10000;
