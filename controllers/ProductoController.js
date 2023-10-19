@@ -73,8 +73,11 @@ module.exports = {
             where: {
                 nombre: {
                     [Op.like]: '%' + searchTerm + '%'
-                }
-            }
+                }         
+            },
+            include: {
+                model: TipoProducto
+             }
         })
             .then(Producto => res.status(200).send(buildResponse(Producto)))
             .catch(error => res.status(400).send(error))
