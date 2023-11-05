@@ -69,6 +69,9 @@ module.exports = {
 
     search(req, res) {
         const searchTerm = req.query.q;
+        if(searchTerm == '') {
+            return res.status(500).send(errorResponse('Ingresar un término es obligatorio'));
+        }
         return Producto.findAll({
             where: {
                 nombre: {
