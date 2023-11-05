@@ -11,6 +11,18 @@
       "isAdmin": 0
     }
   },
+    {
+    "model": "Usuarios",
+    "data": {
+      "nombre": "Admin",
+      "apellido": "Admin",
+      "email": "admin@test.com",
+      "usuario": "admin",
+      "clave": "$2a$12$TTk.q4Gez2E1WqDVV9SSd.9Lxdd4jMo6Fs8ngYmnodQb5lAz7iEAe",
+      "telefono": "3410000000",
+      "isAdmin": 1
+    }
+  },
   {
     "model": "TipoProducto",
     "data": {
