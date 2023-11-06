@@ -25,6 +25,14 @@ module.exports = {
           key: 'id'
         }
       },
+      medioDePago: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'MedioPagos',
+          key: 'id'
+        }
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
