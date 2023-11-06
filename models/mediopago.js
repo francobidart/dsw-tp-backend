@@ -10,20 +10,20 @@ module.exports = (sequelize, DataTypes) => {
          * The `models/index` file will call this method automatically.
          */
         static associate(models) {
-        
+            this.hasMany(models.Pedido, {foreignKey: 'medioDePago', as: 'medioDePagoPedido'})
         }
     }
 
     MedioPago.init({
         id: {
             type: DataTypes.STRING,
-           autoIncrement: true,
+            autoIncrement: true,
             primaryKey: true
         },
-        tag: {type: DataTypes.STRING, unique:true},
+        tag: {type: DataTypes.STRING, unique: true},
         nombre: DataTypes.STRING,
         descripcion: DataTypes.STRING,
-       
+
     }, {
         sequelize,
         modelName: 'MedioPago',

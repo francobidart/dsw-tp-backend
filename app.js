@@ -16,6 +16,7 @@ const mediopago = require('./models/mediopago');
 const MedioPagoController = require('./controllers/MedioPagoController');
 const SucursalController = require('./controllers/SucursalController');
 const PedidosController = require('./controllers/PedidosController');
+const {validarCambioEstado, validarEntregaPedido, validarCancelacionPedido, validarCambioEstadoPedido} = require("./controllers/PedidosController");
 
 app.use(cookieParser());
 
@@ -70,7 +71,7 @@ app.get('/mediopago/:tag', MedioPagoController.find);
 app.get('/sucursales/', SucursalController.list)
 
 app.get('/pedidos', authenticateToken, PedidosController.list);
-app.get('/pedidos/:id', authenticateToken, PedidosController.getById);
+app.get('/pedidos/:id(\\d+)', authenticateToken, PedidosController.getById);
 
 app.post('/pedidos/registrar', authenticateToken, PedidosController.create)
 
@@ -79,6 +80,9 @@ app.post('/pedidos/registrar', authenticateToken, PedidosController.create)
 
 app.get('/clientes', authenticateAdmin, usuarioController.list)
 app.get('/clientes/:id', authenticateAdmin, usuarioController.find)
+app.get('/pedidos/stats', authenticateAdmin, PedidosController.listPedidosNoEntregados)
+app.get('/pedidos/entregar/:id', [authenticateAdmin, validarCambioEstadoPedido], PedidosController.entregarPedido)
+app.get('/pedidos/cancelar/:id', [authenticateAdmin, validarCambioEstadoPedido], PedidosController.cancelarPedido)
 
 app.get('*', function (req, res) {
     res.status(404).send(errorResponse('404 - Not Found'));

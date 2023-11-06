@@ -49,7 +49,9 @@ module.exports = {
                     isAdmin: true
                 }
             })
-            if(user === null) throw 'No autorizado';
+            res.locals.user = user.id;
+            res.locals.isAdmin = user.isAdmin;
+            if (user === null) throw 'No autorizado';
             next();
         } catch {
             return res.status(403).send({mensaje: 'El usuario no posee los permisos requeridos para acceder a este recurso.'})
