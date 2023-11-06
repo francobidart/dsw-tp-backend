@@ -48,6 +48,7 @@ app.get('/', authenticateAdmin, productoController.list)
 app.get('/products/', productoController.list);
 app.get('/products/search/', productoController.search);
 app.get('/products/:id', productoController.find);
+
 // Categorías
 app.get('/categories/', tipoProductoController.list);
 app.get('/categories/:id', tipoProductoController.find);

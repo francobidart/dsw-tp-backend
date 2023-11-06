@@ -144,6 +144,10 @@ module.exports = {
                     model: Usuarios,
                     as: 'clientePedido',
                     attributes: ['id', 'nombre', 'apellido', 'email']
+                },
+                {
+                    model: EstadoPedido,
+                    as: 'detalleEstadoActual'
                 }
             ],
             attributes: {exclude: ['cliente']}
