@@ -28,6 +28,7 @@ module.exports = (sequelize, DataTypes) => {
         imagen: DataTypes.STRING,
         nombre: DataTypes.STRING,
         descripcion: DataTypes.STRING,
+        activo: DataTypes.INTEGER,
         stock: {
             type: DataTypes.FLOAT,
             validate: {

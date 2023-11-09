@@ -15,6 +15,14 @@ module.exports = {
             where: {email: values.email}
         })
 
+        let createAdminUser = false;
+
+        if(res.locals.isAdmin) {
+            if(values.isAdmin) {
+                createAdminUser = true;
+            }
+        }
+
         var hash = bcrypt.hashSync(values.password, 10);
 
         if (user !== null) {
@@ -27,7 +35,8 @@ module.exports = {
                     email: values.email,
                     telefono: values.telefono,
                     usuario: values.usuario,
-                    clave: hash
+                    clave: hash,
+                    isAdmin: createAdminUser
                 })
                 .then(Usuarios => res.status(200).send(buildResponse(Usuarios)))
                 .catch(error => res.status(400).send(errorResponse(error)))

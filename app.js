@@ -16,7 +16,14 @@ const mediopago = require('./models/mediopago');
 const MedioPagoController = require('./controllers/MedioPagoController');
 const SucursalController = require('./controllers/SucursalController');
 const PedidosController = require('./controllers/PedidosController');
-const {validarCambioEstado, validarEntregaPedido, validarCancelacionPedido, validarCambioEstadoPedido} = require("./controllers/PedidosController");
+const {
+    validarCambioEstado,
+    validarEntregaPedido,
+    validarCancelacionPedido,
+    validarCambioEstadoPedido
+} = require("./controllers/PedidosController");
+const {Sequelize} = require("sequelize");
+const config = require("./config/config.json");
 
 app.use(cookieParser());
 
@@ -33,7 +40,6 @@ var corsOptions = {
     }
 }
 
-
 app.use(cors(corsOptions))
 
 app.use(bodyParser.json());
@@ -43,10 +49,12 @@ app.use(forms.array());
 
 app.use(express.json());
 
+
 app.get('/', authenticateAdmin, productoController.list)
 
 // Productos
 app.get('/products/', productoController.list);
+app.get('/products/disabled', authenticateAdmin, productoController.listDisabled);
 app.get('/products/search/', productoController.search);
 app.get('/products/:id', productoController.find);
 // Categorías
@@ -79,9 +87,31 @@ app.post('/pedidos/registrar', authenticateToken, PedidosController.create)
 
 app.get('/clientes', authenticateAdmin, usuarioController.list)
 app.get('/clientes/:id', authenticateAdmin, usuarioController.find)
+
 app.get('/pedidos/stats', authenticateAdmin, PedidosController.listPedidosNoEntregados)
 app.get('/pedidos/entregar/:id', [authenticateAdmin, validarCambioEstadoPedido], PedidosController.entregarPedido)
 app.get('/pedidos/cancelar/:id', [authenticateAdmin, validarCambioEstadoPedido], PedidosController.cancelarPedido)
+app.post('/registrarUsuario', authenticateAdmin, usuarioController.create);
+
+app.post('/products/:id', [
+    authenticateAdmin,
+    body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
+    body('categoria').isNumeric().withMessage('La categoría es obligatoria'),
+    body('precio').isNumeric().withMessage('El precio es obligatorio'),
+    body('stock').isNumeric().withMessage('El inventario es obligatorio'),
+], productoController.update);
+
+app.post('/products', [
+    authenticateAdmin,
+    body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
+    body('categoria').isNumeric().withMessage('La categoría es obligatoria'),
+    body('precio').isNumeric().withMessage('El precio es obligatorio'),
+    body('stock').isNumeric().withMessage('El inventario es obligatorio'),
+], productoController.create);
+
+app.get('/products/:id/disable', authenticateAdmin, productoController.disableProduct)
+app.get('/products/:id/enable', authenticateAdmin, productoController.enableProduct)
+
 
 app.get('*', function (req, res) {
     res.status(404).send(errorResponse('404 - Not Found'));
@@ -97,27 +127,3 @@ app.listen(port, () => {
 
 
 app.use(bodyParser.json());
-
-/*
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '1234',
-  database: 'tp_dsw',
-});
-
-app.get('/api/buscar', (req, res) => {
-  const searchTerm = req.query.q;
-  const query = `SELECT * FROM tu_tabla WHERE descripcion LIKE '%${searchTerm}%'`;
-  
-  db.query(query, (error, results) => {
-    if (error) {
-      console.error(error);
-      return res.status(500).json({ error: 'Error en la búsqueda' });
-    }
-    
-    res.json(results);
-  });
-});
-
- */
