@@ -52,6 +52,16 @@ app.use(express.json());
 
 app.get('/', authenticateAdmin, productoController.list)
 
+// Tipo Productos
+app.get('/tipoproducto/', productoController.list);
+app.get('/tipoproducto/find', productoController.find);
+
+
+app.post('/tipoproducto/crearprod',productoController.create);
+app.post('/tipoproducto/borrarprod',productoController.delete);
+app.post('/tipoproducto/update',productoController.update);
+
+
 // Productos
 app.get('/products/', productoController.list);
 app.get('/products/disabled', authenticateAdmin, productoController.listDisabled);

@@ -15,7 +15,7 @@ module.exports = {
     res.status(400).send({ error: 'Error al crear tipo de producto', details: error.message });
   }
 },
-    async deleteTipoProducto (req, res)  {
+    async delete (req, res)  {
   try {
     const tipoProductoId = req.params.id;
 
@@ -31,7 +31,7 @@ module.exports = {
   }
 },
 
-// Modificación (Update)
+
  async update (req, res) {
   try {
     const tipoProductoId = req.params.id;
