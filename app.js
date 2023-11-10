@@ -53,13 +53,13 @@ app.use(express.json());
 app.get('/', authenticateAdmin, productoController.list)
 
 // Tipo Productos
-app.get('/tipoproducto/', productoController.list);
-app.get('/tipoproducto/find', productoController.find);
+app.get('/tipoproducto/', tipoProductoController.list);
+app.get('/tipoproducto/:id', tipoProductoController.find);
 
 
-app.post('/tipoproducto/crearprod',productoController.create);
-app.post('/tipoproducto/borrarprod',productoController.delete);
-app.post('/tipoproducto/update',productoController.update);
+app.post('/tipoproducto/crearprod',tipoProductoController.Create);
+app.post('/tipoproducto/borrarprod',tipoProductoController.delete);
+app.post('/tipoproducto/update',tipoProductoController.update);
 
 
 // Productos
