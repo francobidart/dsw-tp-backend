@@ -57,9 +57,9 @@ app.get('/tipoproducto/', tipoProductoController.list);
 app.get('/tipoproducto/:id', tipoProductoController.find);
 
 
-app.post('/tipoproducto/crearprod',tipoProductoController.Create);
-app.post('/tipoproducto/borrarprod',tipoProductoController.delete);
-app.post('/tipoproducto/update',tipoProductoController.update);
+app.post('/tipoproducto/crear', authenticateAdmin,tipoProductoController.create);
+app.post('/tipoproducto/:id/borrar', authenticateAdmin,tipoProductoController.delete);
+app.post('/tipoproducto/:id/update', authenticateAdmin,tipoProductoController.update);
 
 
 // Productos

@@ -5,49 +5,47 @@ const TipoProducto = require('../models').TipoProducto;
 
 module.exports = {
 
-    async Create (req, res) {
-  try {
-    const { nombre } = req.body;
+    async create(req, res) {
+        try {
+            const tipoProducto = await TipoProducto.create({nombre: req.body.nombre});
+            res.status(200).send({message: 'Categoría correctamente', data: tipoProducto});
+        } catch (error) {
+            res.status(400).send({error: 'Error al crear la categoría', details: error.message});
+        }
+    }, async delete(req, res) {
+        try {
+            const tipoProductoId = req.params.id;
 
-    const tipoProducto = await TipoProducto.create({ nombre });
-    res.status(200).send({ message: 'Tipo de producto creado correctamente', data: tipoProducto });
-  } catch (error) {
-    res.status(400).send({ error: 'Error al crear tipo de producto', details: error.message });
-  }
-},
-    async delete (req, res)  {
-  try {
-    const tipoProductoId = req.params.id;
+            const resultado = await TipoProducto.destroy({where: {id: tipoProductoId}});
 
-    const resultado = await TipoProducto.destroy({ where: { id: tipoProductoId } });
-
-    if (resultado === 1) {
-      res.status(200).send({ message: 'Tipo de producto eliminado correctamente' });
-    } else {
-      res.status(404).send({ error: 'No se encontró el tipo de producto con el ID especificado' });
-    }
-  } catch (error) {
-    res.status(400).send({ error: 'Error al eliminar tipo de producto', details: error.message });
-  }
-},
+            if (resultado === 1) {
+                res.status(200).send({message: 'Categoría eliminada correctamente'});
+            } else {
+                res.status(404).send({error: 'No se encontró una categoría con el ID especificado'});
+            }
+        } catch (error) {
+            res.status(400).send({error: 'Error al eliminar categoría', details: error.message});
+        }
+    },
 
 
- async update (req, res) {
-  try {
-    const tipoProductoId = req.params.id;
-    const { nombre } = req.body;
+    async update(req, res) {
+        try {
+            const resultado = await TipoProducto.update(
+                {nombre: req.body.nombre},
+                {where: {
+                    id: req.params.id
+                }});
 
-    const resultado = await TipoProducto.update({ nombre }, { where: { id: tipoProductoId } });
-
-    if (resultado[0] === 1) {
-      res.status(200).send({ message: 'Tipo de producto actualizado correctamente' });
-    } else {
-      res.status(404).send({ error: 'No se encontró el tipo de producto con el ID especificado' });
-    }
-  } catch (error) {
-    res.status(400).send({ error: 'Error al actualizar tipo de producto', details: error.message });
-  }
-},
+            if (resultado[0] === 1) {
+                res.status(200).send({message: 'Categoría actualizada correctamente'});
+            } else {
+                res.status(404).send({error: 'No se encontró una categoría con el ID especificado'});
+            }
+        } catch (error) {
+            res.status(400).send({error: 'Error al actualizar categoría', details: error.message});
+        }
+    },
 
 
     list(req, res) {
