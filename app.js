@@ -57,10 +57,16 @@ app.get('/tipoproducto/', tipoProductoController.list);
 app.get('/tipoproducto/:id', tipoProductoController.find);
 
 
-app.post('/tipoproducto/crearprod',tipoProductoController.Create);
+app.post('/tipoproducto/crearprod', [
+    authenticateAdmin,
+    body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
+], tipoProductoController.Create);
 app.post('/tipoproducto/borrarprod',tipoProductoController.delete);
-app.post('/tipoproducto/update',tipoProductoController.update);
 
+app.post('/tipoproducto/update', [
+    authenticateAdmin,
+    body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
+], tipoProductoController.update);
 
 // Productos
 app.get('/products/', productoController.list);
