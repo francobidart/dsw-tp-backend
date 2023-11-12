@@ -57,9 +57,15 @@ app.get('/tipoproducto/', tipoProductoController.list);
 app.get('/tipoproducto/:id', tipoProductoController.find);
 
 
-app.post('/tipoproducto/crear', authenticateAdmin,tipoProductoController.create);
+app.post('/tipoproducto/crear', [
+    authenticateAdmin,
+    body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
+],tipoProductoController.create);
 app.post('/tipoproducto/:id/borrar', authenticateAdmin,tipoProductoController.delete);
-app.post('/tipoproducto/:id/update', authenticateAdmin,tipoProductoController.update);
+app.post('/tipoproducto/:id/update', [
+    authenticateAdmin,
+    body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
+],tipoProductoController.update);
 
 
 // Productos

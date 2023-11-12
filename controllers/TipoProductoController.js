@@ -58,9 +58,9 @@ module.exports = {
 
     find(req, res) {
         return TipoProducto.findAll({
-            where: {
+
                 id: req.params.id,
-            }
+
         })
             .then(TipoProducto => res.status(200).send(buildResponse(TipoProducto)))
             .catch(error => res.status(400).send(errorResponse(error)))
