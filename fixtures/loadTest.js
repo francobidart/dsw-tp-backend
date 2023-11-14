@@ -51,11 +51,6 @@ function cargaFinalizada() {
     console.log('Carga finalizada');
     process.exit();
 }
-
-function myLogging(defaultLog) {
-    console.log('Cargando fixtures');
-}
-
 function errorReporter(message) {
     console.error('Error al ejecutar la carga ' + message);
     process.exit()

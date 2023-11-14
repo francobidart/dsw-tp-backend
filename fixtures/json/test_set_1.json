@@ -67,14 +67,6 @@
     }
   },
   {
-    "model": "MedioPago",
-    "data": {
-      "id": 2,
-      "tag": "mercado_pago",
-      "nombre": "Mercado Pago"
-    }
-  },
-  {
     "model": "Producto",
     "data": {
       "id": 1,

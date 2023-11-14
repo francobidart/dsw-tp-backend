@@ -8,7 +8,7 @@ const port = 3000
 var bodyParser = require('body-parser');
 var multer = require('multer');
 const {query, body} = require("express-validator");
-const {errorResponse, authenticateToken, authenticateAdmin} = require("./utils/Utils");
+const {errorResponse, authenticateToken, authenticateAdmin, injectIsAdmin, buildResponse} = require("./utils/Utils");
 var forms = multer();
 var cors = require('cors')
 const cookieParser = require('cookie-parser');
@@ -50,36 +50,28 @@ app.use(forms.array());
 app.use(express.json());
 
 
-app.get('/', authenticateAdmin, productoController.list)
+app.get('/', authenticateAdmin, function (req, res) {
+   res.status(200).json(['DSW TP Backend']);
+});
 
 // Tipo Productos
 app.get('/tipoproducto/', tipoProductoController.list);
 app.get('/tipoproducto/:id', tipoProductoController.find);
 
 
-app.post('/tipoproducto/crear', [
-    authenticateAdmin,
-    body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
-],tipoProductoController.create);
-app.post('/tipoproducto/:id/borrar', authenticateAdmin,tipoProductoController.delete);
-app.post('/tipoproducto/:id/update', [
-    authenticateAdmin,
-    body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
-],tipoProductoController.update);
-
-
 // Productos
-app.get('/products/', productoController.list);
+app.get('/products/', injectIsAdmin, productoController.list);
 app.get('/products/disabled', authenticateAdmin, productoController.listDisabled);
 app.get('/products/search/', productoController.search);
-app.get('/products/:id', productoController.find);
+app.get('/products/:id', injectIsAdmin, productoController.find);
 
 // Categorías
 app.get('/categories/', tipoProductoController.list);
 app.get('/categories/:id', tipoProductoController.find);
-app.get('/categories/:id/products', productoController.findByCat);
+app.get('/categories/:id/products', injectIsAdmin, productoController.findByCat);
 
-app.get('/users', authenticateToken, usuarioController.list);
+app.get('/users', authenticateAdmin, usuarioController.list);
+app.get('/users/:id', authenticateAdmin, usuarioController.find);
 
 app.get('/session/validateSession', usuarioController.validateSession);
 app.get('/session/validateAdmin', usuarioController.validateAdmin);
@@ -87,7 +79,13 @@ app.get('/account/profile', usuarioController.getLoggedAccountData);
 
 app.get('/logout', usuarioController.logout)
 app.post('/login', usuarioController.login);
-app.post('/usuarios', usuarioController.create);
+app.post('/usuarios', [
+    body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
+    body('apellido').notEmpty().withMessage('El apellido es obligatorio'),
+    body('email').isEmail().withMessage('El email es obligatorio'),
+    body('password').notEmpty().withMessage('La clave es obligatoria'),
+    body('telefono').notEmpty().withMessage('El telefono es obligatorio'),
+], usuarioController.create);
 
 // Medio Pago
 app.get('/mediopago/', MedioPagoController.list);
@@ -102,14 +100,30 @@ app.post('/pedidos/registrar', authenticateToken, PedidosController.create)
 // MODULO ADMINSTRADOR
 // Todos estos endpoints requieren autenticación superior, utilizar authenticateAdmin
 
+// CLIENTES
 app.get('/clientes', authenticateAdmin, usuarioController.list)
 app.get('/clientes/:id', authenticateAdmin, usuarioController.find)
+app.post('/usuarios/registrar', authenticateAdmin, usuarioController.create);
+app.post('/usuarios/:id', [
+    authenticateAdmin,
+    body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
+    body('apellido').notEmpty().withMessage('El apellido es obligatorio'),
+    body('email').isEmail().withMessage('El email es obligatorio'),
+    body('telefono').notEmpty().withMessage('El telefono es obligatorio'),
+], usuarioController.updateUser);
+app.get('/usuarios/:id/disable', authenticateAdmin, usuarioController.disableUser);
+app.get('/usuarios/:id/enable', authenticateAdmin, usuarioController.enableUser);
+app.post('/usuarios/:id/cambiarClave', [
+    authenticateAdmin,
+    body('password').notEmpty().withMessage('La nueva contraseña es obligatoria')
+], usuarioController.changeUserPassword);
 
+// PEDIDOS
 app.get('/pedidos/stats', authenticateAdmin, PedidosController.listPedidosNoEntregados)
 app.get('/pedidos/entregar/:id', [authenticateAdmin, validarCambioEstadoPedido], PedidosController.entregarPedido)
 app.get('/pedidos/cancelar/:id', [authenticateAdmin, validarCambioEstadoPedido], PedidosController.cancelarPedido)
-app.post('/registrarUsuario', authenticateAdmin, usuarioController.create);
 
+// PRODUCTOS
 app.post('/products/:id', [
     authenticateAdmin,
     body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
@@ -117,7 +131,6 @@ app.post('/products/:id', [
     body('precio').isNumeric().withMessage('El precio es obligatorio'),
     body('stock').isNumeric().withMessage('El inventario es obligatorio'),
 ], productoController.update);
-
 app.post('/products', [
     authenticateAdmin,
     body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
@@ -125,10 +138,13 @@ app.post('/products', [
     body('precio').isNumeric().withMessage('El precio es obligatorio'),
     body('stock').isNumeric().withMessage('El inventario es obligatorio'),
 ], productoController.create);
-
 app.get('/products/:id/disable', authenticateAdmin, productoController.disableProduct)
 app.get('/products/:id/enable', authenticateAdmin, productoController.enableProduct)
 
+// CATEGORÍAS
+app.post('/categories', [authenticateAdmin, body('nombre').notEmpty().withMessage('El nombre es obligatorio'),], tipoProductoController.create);
+app.post('/categories/:id/update', [authenticateAdmin, body('nombre').notEmpty().withMessage('El nombre es obligatorio')], tipoProductoController.update);
+app.get('/categories/:id/borrar', authenticateAdmin, tipoProductoController.delete);
 
 app.get('*', function (req, res) {
     res.status(404).send(errorResponse('404 - Not Found'));

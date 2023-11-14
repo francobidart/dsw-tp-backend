@@ -1,4 +1,3 @@
-
 const Sequelize = require('sequelize');
 const {errorResponse, buildResponse} = require("../utils/Utils");
 const {Op} = require("sequelize");
@@ -73,7 +72,7 @@ module.exports = {
         })
 
         await producto.save().then((result) => {
-            res.status(200).send(buildResponse('Artículo deshabilitado correctamente.'))
+            res.status(200).send(buildResponse(null, 'Artículo deshabilitado correctamente.'))
         }).catch((err) => {
             res.status(500).send(errorResponse(err));
         });
@@ -89,28 +88,45 @@ module.exports = {
         })
 
         await producto.save().then((result) => {
-            res.status(200).send(buildResponse('Artículo habilitado correctamente.'))
+            res.status(200).send(buildResponse(null, 'Artículo habilitado correctamente.'))
         }).catch((err) => {
             res.status(500).send(errorResponse(err));
         });
     },
 
     list(req, res) {
+        let whereOptions = {
+            activo: true
+        }
+
+        if (res.locals.isAdmin) {
+            whereOptions = {}
+        }
+
+
         let page = req.query.page ? req.query.page : 0;
         let limit = req.query.limit ? parseInt(req.query.limit) : 10000;
         let offset = page * limit;
         return Producto.findAndCountAll({
             limit: limit,
             offset: offset,
-            where: {
-                activo: true
-            },
+            where: whereOptions,
             include: {
                 model: TipoProducto
+            },
+            order: [
+                ['id', 'DESC']
+            ]
+        }).then(Producto => {
+            for (var i = 0; i < Producto.rows.length; i++) {
+                let row = Producto.rows[i];
+                if (!row.imagen) {
+                    row.imagen = '/assets/img/not-found.png'
+                }
             }
-        })
-            .then(Producto => res.status(200).send(buildResponse(Producto.rows)))
-            .catch(error => res.status(400).send(errorResponse(error)))
+            res.status(200).send(buildResponse(Producto.rows))
+
+        }).catch(error => res.status(400).send(errorResponse(error)))
     },
 
     listDisabled(req, res) {
@@ -127,7 +143,15 @@ module.exports = {
                 model: TipoProducto
             }
         })
-            .then(Producto => res.status(200).send(buildResponse(Producto.rows)))
+            .then(Producto => {
+                for (var i = 0; i < Producto.rows.length; i++) {
+                    let row = Producto.rows[i];
+                    if (!row.imagen) {
+                        row.imagen = '/assets/img/not-found.png'
+                    }
+                }
+                res.status(200).send(buildResponse(Producto.rows))
+            })
             .catch(error => res.status(400).send(errorResponse(error)))
     },
 
@@ -145,29 +169,60 @@ module.exports = {
         let limit = 10000;
         let categoria = req.params.id;
         let offset = page * limit;
+
+        let whereOptions = {categoria: categoria, stock: {[Op.gt]: 0}, activo: true}
+
+        if (res.locals.isAdmin) {
+            whereOptions = {categoria: categoria, stock: {[Op.gt]: 0}}
+        }
+
+
         return Producto.findAndCountAll({
             limit: limit,
             offset: offset,
-            where: {categoria: categoria, stock: {[Op.gt]: 0}, activo: true},
+            where: whereOptions,
             order: [orderArray],
             include: {
                 model: TipoProducto
             }
         })
-            .then(Producto => res.status(200).send(buildResponse(Producto.rows)))
+            .then(Producto => {
+                for (var i = 0; i < Producto.rows.length; i++) {
+                    let row = Producto.rows[i];
+                    if (!row.imagen) {
+                        row.imagen = '/assets/img/not-found.png'
+                    }
+                }
+                res.status(200).send(buildResponse(Producto.rows))
+            })
             .catch(error => res.status(400).send(errorResponse(error)))
     },
     find(req, res) {
+        let whereOptions = {
+            id: req.params.id,
+            activo: true
+        }
+
+        if (res.locals.isAdmin) {
+            whereOptions = {
+                id: req.params.id
+            }
+        }
+
         return Producto.findAll({
-            where: {
-                id: req.params.id,
-                activo: true
-            },
+            where: whereOptions,
             include: {
                 model: TipoProducto
             }
         })
-            .then(Producto => res.status(200).send(buildResponse(Producto)))
+            .then(Producto => {
+                for (var i = 0; i < Producto.length; i++) {
+                    if (!Producto[i].dataValues.imagen) {
+                        Producto[i].dataValues.imagen = '/assets/img/not-found.png'
+                    }
+                }
+                res.status(200).send(buildResponse(Producto))
+            })
             .catch(error => res.status(400).send(error))
     },
 
@@ -187,7 +242,14 @@ module.exports = {
                 model: TipoProducto
             }
         })
-            .then(Producto => res.status(200).send(buildResponse(Producto)))
+            .then(Producto => {
+                for (var i = 0; i < Producto.length; i++) {
+                    if (!Producto[i].dataValues.imagen) {
+                        Producto[i].dataValues.imagen = '/assets/img/not-found.png'
+                    }
+                }
+                res.status(200).send(buildResponse(Producto))
+            })
             .catch(error => res.status(400).send(error))
     },
 };

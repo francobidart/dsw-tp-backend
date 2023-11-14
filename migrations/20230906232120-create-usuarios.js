@@ -21,10 +21,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      usuario: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
       clave: {
         type: Sequelize.STRING,
         allowNull: false
@@ -45,6 +41,11 @@ module.exports = {
         allowNull: false,
         type: Sequelize.INTEGER,
         defaultValue: 0
+      },
+      active: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+        defaultValue: 1
       }
     });
   },

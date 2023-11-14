@@ -13,6 +13,10 @@ const {sequelize} = require('../models');
 
 module.exports = {
     async create(req, res) {
+        if(res.locals.isAdmin) {
+            res.status(500).send(errorResponse('Para realizar una compra, deberás ingresar con un usuario de tipo CLIENTE, los administradores no pueden realizar compras en la plataforma.'))
+            return;
+        }
         const pedido = req.body;
         if ((!pedido.articulos || pedido.articulos.length === 0) || !pedido.sucursal || !pedido.mediodepago) {
             res.status(500).send(errorResponse('Faltan datos obligatorios para el pedido.'))
@@ -109,8 +113,31 @@ module.exports = {
                 where: {
                     id: req.params.id
                 },
+                include: [
+                    {
+                    model: DetallePedido,
+                    attributes: ['articulo', 'cantidad'],
+                    as: 'detallePedido'
+                }
+                ],
                 transaction: t
             })
+
+
+            for(var i = 0; i < pedido.dataValues.detallePedido.length; i++) {
+                let detallePedido = pedido.dataValues.detallePedido[i].dataValues;
+                const productoActualizarStock = await Producto.findOne({
+                    where: {
+                        id: detallePedido.articulo
+                    },
+                    transaction: t
+                });
+                productoActualizarStock.set({
+                    stock: parseFloat(productoActualizarStock.stock) + parseFloat(detallePedido.cantidad)
+                })
+                await productoActualizarStock.save({transaction: t})
+            }
+
             pedido.set('estadoActual', 5);
             await pedido.save({transaction: t});
             const historialEstado = await HistorialEstadoPedido.create({

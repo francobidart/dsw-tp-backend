@@ -32,10 +32,6 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false
         },
-        usuario: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
         clave: {
             type: DataTypes.STRING,
             allowNull: false
@@ -45,6 +41,10 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         },
         isAdmin: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        active: {
             type: DataTypes.INTEGER,
             allowNull: false
         }
