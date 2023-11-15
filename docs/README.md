@@ -97,6 +97,7 @@ Es importante aclarar que la aplicación se encuentra protegida por politicas CO
 Los valores permitidos por defecto son:
 
 * **localhost:4200** (Puerto por defecto de Angular).
+* **localhost:3000** (Puerto por defecto de Express).
 
 De ser necesario, realice los ajustes necesarios para la correcta ejecución de la aplicación desde la variable mencionada anteriormente.
 
