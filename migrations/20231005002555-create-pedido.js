@@ -33,6 +33,14 @@ module.exports = {
           key: 'id'
         }
       },
+      sucursal: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Sucursales',
+          key: 'id'
+        }
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

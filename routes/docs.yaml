@@ -1,0 +1,968 @@
+openapi: 3.1.0
+info:
+  title: Documentación de API
+  description: "Documentación de la API web de El Patrón del Hard"
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000
+    description: Desarrollo
+tags:
+  - name: Sesión
+    description: Haga uso de estos endpoints primero para poder utilizar los recursos protegidos.
+  - name: Productos
+    description: Endpoints con información de los artículos.
+  - name: Categorías
+    description: Endpoints de las categorías de la plataforma.
+  - name: Sucursales
+    description: Endpoints de las sucursales de la plataforma.
+  - name: Medios de pago
+    description: Endpoints de los medios de pago de la plataforma.
+  - name: Pedidos
+    description: Endpoints para operaciones sobre pedidos.
+  - name: Clientes y Usuarios
+    description: Endpoints para operaciones sobre clientes y usuarios de la plataforma.
+paths:
+  /login:
+    post:
+      tags:
+        - Sesión
+      summary: Iniciar sesión
+      description: Este endpoint permite iniciar sesión con un determinado usuario, utilice este método para poder acceder a recursos protegidos.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  default: "test@test.com"
+                password:
+                  type: string
+                  default: "admin"
+      responses:
+        '200':
+          description: Inicio de sesión exitoso.
+          headers:
+            Set-Cookie:
+              description: Cookie de sesión.
+              schema:
+                type: string
+                example: "tk=token_de_sesion; Path=/; HttpOnly"
+        '500':
+          description: Faltan datos obligatorios.
+  /logout:
+    get:
+      tags:
+        - Sesión
+      summary: Cerrar sesión
+      description: Este endpoint permite cerrar la sesión activa.
+      responses:
+        '200':
+          description: Cierre de sesión exitoso
+  /session/validateSession:
+    get:
+      tags:
+        - Sesión
+      summary: Verifica la validez del JWT y el estado de la cuenta del usuario
+      description: Este endpoint permite consultar la validez de la sesión del usuario.
+      responses:
+        '200':
+          description: Usuario identificado correctamente
+        '403':
+          description: Sesión no iniciada
+        '500':
+          description: Token no valido o usuario no habilitado
+  /session/validateAdmin:
+    get:
+      tags:
+        - Sesión
+      summary: Verifica la validez del JWT y si el usuario es un administrador
+      description: Este endpoint permite consultar si el usuario es administrador.
+      responses:
+        '200':
+          description: Usuario identificado correctamente
+        '403':
+          description: Sesión no iniciada
+        '500':
+          description: Token no valido o usuario no habilitado
+  /account/profile:
+    get:
+      tags:
+        - Sesión
+      summary: Retorna los datos del usuario logueado
+      description: Este endpoint permite consultar los datos del usuario que tiene una sesión activa.
+      responses:
+        '200':
+          description: Muestra los datos del usuario
+        '403':
+          description: Sesión no iniciada
+        '500':
+          description: Token no valido o usuario no habilitado
+  /products:
+    get:
+      tags:
+        - Productos
+      summary: Muestra el listado de productos disponibles
+      parameters:
+        - in: query
+          name: limit
+          type: int
+          description: Cantidad de productos a mostrar por página
+          required: false
+        - in: query
+          name: page
+          type: int
+          description: Página de resultados (Desde la página 0 a n)
+      responses:
+        '200':
+          description: Muestra el listado de productos
+        '400':
+          description: Error al consultar productos
+    post:
+      tags:
+        - Productos
+      summary: Registra un nuevo producto
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  required: true
+                categoria:
+                  type: int
+                  description: Debe ser el ID de una categoría existente
+                  required: true
+                precio:
+                  type: float
+                  required: true
+                stock:
+                  type: float
+                  required: true
+      responses:
+        '200':
+          description: Producto registrado correctamente
+        '400':
+          description: Faltan datos obligatorios | Error al registrar el producto
+  /products/{id}:
+    get:
+      tags:
+        - Productos
+      summary: Muestra el los datos de un determinado producto
+      parameters:
+        - in: path
+          name: id
+          type: int
+          description: ID del producto a consultar
+          required: true
+      responses:
+        '200':
+          description: Muestra el producto solicitado
+        '400':
+          description: Error al consultar producto
+    post:
+      tags:
+        - Productos
+      summary: Actualiza los datos de un determinado producto
+      parameters:
+        - in: path
+          name: id
+          type: int
+          description: ID del producto a modificar
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  required: true
+                categoria:
+                  type: int
+                  description: Debe ser el ID de una categoría existente
+                  required: true
+                precio:
+                  type: float
+                  required: true
+                stock:
+                  type: float
+                  required: true
+      responses:
+        '200':
+          description: Se actualiza el producto
+        '400':
+          description: Faltan datos obligatorios
+  /products/disabled:
+    get:
+      tags:
+        - Productos
+      summary: Muestra el listado de productos deshabilitados (REQUIERE LOGIN ADMIN)
+      parameters:
+        - in: query
+          name: limit
+          type: int
+          description: Cantidad de productos a mostrar por página
+          required: false
+        - in: query
+          name: page
+          type: int
+          description: Página de resultados (Desde la página 0 a n)
+      responses:
+        '200':
+          description: Muestra el listado de productos
+        '400':
+          description: Error al consultar productos
+  /products/search/:
+    get:
+      tags:
+        - Productos
+      summary: Realiza una busqueda de productos por nombre
+      parameters:
+        - in: query
+          name: q
+          type: string
+          description: Término a buscar
+          required: true
+      responses:
+        '200':
+          description: Muestra el listado de productos que coincidan con la busqueda
+        '400':
+          description: Error al consultar productos
+  /products/{id}/disable:
+    get:
+      tags:
+        - Productos
+      summary: Deshabilita un determinado producto
+      parameters:
+        - in: path
+          name: id
+          type: int
+          description: ID del producto a deshabilitar
+          required: true
+      responses:
+        '200':
+          description: Deshabilita correctamente el producto
+        '500':
+          description: Error al deshabilitar el producto
+  /products/{id}/enable:
+    get:
+      tags:
+        - Productos
+      summary: Habilita un determinado producto
+      parameters:
+        - in: path
+          name: id
+          type: int
+          description: ID del producto a habilitar
+          required: true
+      responses:
+        '200':
+          description: Habilita correctamente el producto
+        '500':
+          description: Error al habilitar el producto
+  /categories:
+    get:
+      tags:
+        - Categorías
+      summary: Muestra el listado de categorías
+      responses:
+        '200':
+          description: Registra la categoría correctamente
+        '400':
+          description: Error al consultar categorías
+    post:
+      tags:
+        - Categorías
+      summary: Registra una nueva categoría en la plataforma (REQUIERE LOGIN)
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  required: true
+      responses:
+        '200':
+          description: Genera la categoría y retorna su ID.
+        '400':
+          description: Error al crear la categoría (Faltan datos obligatorios)
+        '500':
+          description: Ya existe una categoría con el nombre ingresado.
+  /categories/{id}:
+    get:
+      tags:
+        - Categorías
+      summary: Muestra la información de una categoría
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Muestra los detalles de una categoría
+        '400':
+          description: Error al consultar categoría
+  /categories/{id}/products:
+    get:
+      tags:
+        - Categorías
+      summary: Muestra el listado de productos de una categoría
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+        - in: query
+          name: order
+          type: string
+          required: false
+          description: Permite determinar el orden de resultados (Por defecto ordena por nombre, en caso de seleccionar una de las opciones se ordena por precio)
+          schema:
+            type: string
+            enum:
+              - Ascendente
+              - Descendente
+      responses:
+        '200':
+          description: Listado de productos de una categoría
+        '400':
+          description: Error al consultar productos de una categoría
+  /categories/{id}/update:
+    post:
+      tags:
+        - Categorías
+      summary: Actualiza el nombre de una determinada categoría
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          description: ID de la categoría
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  required: true
+      responses:
+        '200':
+          description: Genera la categoría y retorna su ID.
+        '400':
+          description: Error al crear la categoría (Faltan datos obligatorios) | Error general
+        '404':
+          description: No se encontró una categoría con ID solicitado
+        '500':
+          description: El nombre de la categoría debe ser diferente al actual | Ya existe una categoría con el nombre ingresado
+  /categories/{id}/borrar:
+    get:
+      tags:
+        - Categorías
+      summary: Elimina una categoría determinada
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Elimina la categoría
+        '400':
+          description: Error general al consultar la categoría
+        '404':
+          description: No se encuentra una categoría con el ID solicitado
+        '500':
+          description: No es posible eliminar una categoría que tiene artículos asociados actualmente
+  /sucursales:
+    get:
+      tags:
+        - Sucursales
+      summary: Muestra el listado de sucursales disponibles
+      responses:
+        '200':
+          description: Retorna un listado de sucursales
+        '400':
+          description: Error al consultar sucursales
+    post:
+      tags:
+        - Sucursales
+      summary: Registra una sucursal en la plataforma (REQUIERE ADMINISTRADOR)
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  required: true
+                  description: Nombre de la sucursal
+                  default: Sucursal de pruebas
+                direccion:
+                  type: string
+                  required: true
+                  description: Dirección de la sucursal
+                  default: Dorrego 10, Rosario, Santa Fe
+                telefono:
+                  type: string
+                  required: true
+                  description: Teléfono de la sucursal
+                  default: 3410000000
+      responses:
+        '200':
+          description: Registra la sucursal y retorna sus datos.
+        '400':
+          description: Faltan datos obligatorios.
+        '403':
+          description: El usuario no tiene los permisos requeridos (debe ser administrador).
+        '500':
+          description: Ya existe una sucursal con nombre ingresado.
+  /sucursales/{id}:
+    get:
+      tags:
+        - Sucursales
+      summary: Muestra el detalle de una sucursal
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID de la sucursal consultada
+      responses:
+        '200':
+          description: Retorna el detalle de una sucursal.
+        '400':
+          description: Error al consultar sucursal.
+        '404':
+          description: No existe una sucursal para el ID ingresado.
+    post:
+      tags:
+        - Sucursales
+      summary: Actualiza una sucursal en la plataforma (REQUIERE ADMINISTRADOR)
+      parameters:
+        - in: path
+          name: id
+          description: ID de la sucursal
+          required: true
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  required: true
+                  description: Nombre de la sucursal
+                  default: Sucursal de pruebas
+                direccion:
+                  type: string
+                  required: true
+                  description: Dirección de la sucursal
+                  default: Dorrego 10, Rosario, Santa Fe
+                telefono:
+                  type: string
+                  required: true
+                  description: Teléfono de la sucursal
+                  default: 3410000000
+      responses:
+        '200':
+          description: Actualiza la sucursal y retorna sus datos.
+        '400':
+          description: Faltan datos obligatorios.
+        '403':
+          description: El usuario no tiene los permisos requeridos (debe ser administrador).
+        '500':
+          description: Ya existe una sucursal con el nombre ingresado.
+  /sucursales/{id}/disable:
+    get:
+      tags:
+        - Sucursales
+      summary: Deshabilita una sucursal
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID de la sucursal a deshabilitar
+      responses:
+        '200':
+          description: Deshabilita la sucursal.
+        '403':
+          description: El usuario no tiene los permisos requeridos (debe ser administrador).
+        '500':
+          description: Error al deshabilitar la sucursal.
+  /sucursales/{id}/enable:
+    get:
+      tags:
+        - Sucursales
+      summary: Habilita una sucursal
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID de la sucursal a habilitar
+      responses:
+        '200':
+          description: Habilita la sucursal.
+        '403':
+          description: El usuario no tiene los permisos requeridos (debe ser administrador).
+        '500':
+          description: Error al habilitar la sucursal.
+  /mediopago:
+    get:
+      tags:
+        - Medios de pago
+      summary: Muestra el listado de medios de pago disponibles
+      responses:
+        '200':
+          description: Retorna un listado de medios de pago
+        '400':
+          description: Error al consultar medios de pago
+    post:
+      tags:
+        - Medios de pago
+      summary: Registra un medio de pago en la plataforma (REQUIERE ADMINISTRADOR)
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  required: true
+                  description: Nombre del medio de pago
+                  default: Modo
+                tag:
+                  type: string
+                  required: true
+                  description: Tag del medio de pago
+                  default: modo
+      responses:
+        '200':
+          description: Registra el medio de pago y retorna sus datos.
+        '400':
+          description: Faltan datos obligatorios.
+        '403':
+          description: El usuario no tiene los permisos requeridos (debe ser administrador).
+        '500':
+          description: Ya existe un medio de pago con el nombre ingresado.
+  /mediopago/{id}:
+    get:
+      tags:
+        - Medios de pago
+      summary: Muestra el listado de medios de pago disponibles
+      parameters:
+        - in: path
+          name: id
+          type: string
+          description: ID del medio de pago a consultar
+          required: true
+      responses:
+        '200':
+          description: Retorna el detalle de un medio de pago
+        '400':
+          description: Error al consultar medio de pago
+    post:
+      tags:
+        - Medios de pago
+      summary: Actualiza un medio de pago en la plataforma (REQUIERE ADMINISTRADOR)
+      parameters:
+        - in: path
+          name: id
+          description: ID del medio de pago
+          required: true
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  required: true
+                  description: Nombre del medio de pago
+                  default: Modo
+                tag:
+                  type: string
+                  required: true
+                  description: Tag del medio de pago
+                  default: modo
+      responses:
+        '200':
+          description: Actualiza el medio de pago y retorna sus datos.
+        '400':
+          description: Faltan datos obligatorios.
+        '403':
+          description: El usuario no tiene los permisos requeridos (debe ser administrador).
+        '500':
+          description: Ya existe un medio de pago con el nombre ingresado.
+  /mediopago/{id}/disable:
+    get:
+      tags:
+        - Medios de pago
+      summary: Deshabilita un medio de pago (REQUIERE ADMINISTRADOR)
+      parameters:
+        - in: path
+          name: id
+          type: string
+          description: ID del medio de pago a deshabilitar
+          required: true
+      responses:
+        '200':
+          description: Deshabilita el medio de pago
+        '403':
+          description: El usuario no tiene los permisos requeridos (debe ser administrador).
+        '500':
+          description: Error al deshabilitar el medio de pago
+  /mediopago/{id}/enable:
+    get:
+      tags:
+        - Medios de pago
+      summary: Habilita un medio de pago (REQUIERE ADMINISTRADOR)
+      parameters:
+        - in: path
+          name: id
+          type: string
+          description: ID del medio de pago a habilitar
+          required: true
+      responses:
+        '200':
+          description: Habilita un medio de pago
+        '403':
+          description: El usuario no tiene los permisos requeridos (debe ser administrador).
+        '500':
+          description: Error al habilitar el medio de pago
+  /pedidos:
+    get:
+      tags:
+        - Pedidos
+      summary: Muestra el listado de pedidos (REQUIERE LOGIN)
+      responses:
+        '200':
+          description: Retorna un listado de pedidos del cliente con su detalle, si es administrador muestra todos los pedidos.
+        '400':
+          description: Error al consultar pedidos
+  /pedidos/{id}:
+    get:
+      tags:
+        - Pedidos
+      summary: Muestra el listado de pedidos (REQUIERE LOGIN)
+      parameters:
+        - in: path
+          name: id
+          type: int
+          required: true
+          description: ID del pedido consultado.
+      responses:
+        '200':
+          description: Retorna el pedido junto a su detalle.
+        '404':
+          description: Pedido no encontrado
+        '500':
+          description: Si el usuario es cliente, el pedido que se está consultando no le pertenece.
+  /pedidos/registrar:
+    post:
+      tags:
+        - Pedidos
+      summary: Registra un pedido (REQUIERE LOGIN)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sucursal:
+                  type: int
+                  required: true
+                  default: 1
+                  description: Sucursal de entrega del pedido (ID de una sucursal existente)
+                mediodepago:
+                  type: int
+                  required: true
+                  default: 1
+                  description: Medio de pago del pedido (ID de un medio de pago existente)
+                articulos:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        required: true
+                        description: ID del artículo
+                        default: 1
+                      precio:
+                        type: float
+                        description: Precio del artículo a comprar
+                        required: true
+                        default: 100
+      responses:
+        '200':
+          description: Retorna el pedido junto a su detalle.
+        '500':
+          description: Faltan datos obligatorios | El precio del artículo solicitado es diferente al registrado en la DB | El usuario logueado es administrador, los administradores no pueden registrar pedidos.
+  /pedidos/stats:
+    get:
+      summary: Devuelve las estadísticas de ventas de la plataforma (REQUIERE ADMINISTRADOR)
+      tags:
+        - Pedidos
+      responses:
+        '200':
+          description: Devuelve estadisticas de pedidos del mes.
+        '403':
+          description: El usuario no tiene los permisos requeridos (debe ser administrador).
+  /pedidos/entregar/{id}:
+    get:
+      summary: Marca un pedido como entregado (REQUIERE ADMINISTRADOR)
+      tags:
+        - Pedidos
+      parameters:
+        - in: path
+          name: id
+          description: ID del pedido a entregar
+          required: true
+      responses:
+        '200':
+          description: Marca el pedido como entregado.
+        '403':
+          description: El usuario no tiene los permisos requeridos (debe ser administrador).
+        '404':
+          description: Pedido no encontrado
+        '500':
+          description: Error al entregar el pedido | No es realizar esta acción un pedido que se encuentra en estado ENTREGADO o CANCELADO
+  /pedidos/cancelar/{id}:
+    get:
+      summary: Marca un pedido como cancelado y retorna el stock al estado anterior (REQUIERE ADMINISTRADOR)
+      tags:
+        - Pedidos
+      parameters:
+        - in: path
+          name: id
+          description: ID del pedido a entregar
+          required: true
+      responses:
+        '200':
+          description: Marca el pedido como cancelado.
+        '403':
+          description: El usuario no tiene los permisos requeridos (debe ser administrador).
+        '404':
+          description: Pedido no encontrado
+        '500':
+          description: Error al cancelado el pedido | No es realizar esta acción un pedido que se encuentra en estado ENTREGADO o CANCELADO
+  /users:
+    get:
+      summary: Devuelve los usuarios de la plataforma (REQUIERE ADMINISTRADOR)
+      tags:
+        - Clientes y Usuarios
+      responses:
+        '200':
+          description: Devuelve un listado de usuarios.
+        '400':
+          description: Error al consultar los usuarios.
+        '403':
+          description: El usuario no tiene los permisos requeridos (debe ser administrador).
+    post:
+      tags:
+        - Clientes y Usuarios
+      summary: Registra un nuevo usuario de tipo cliente en la plataforma, utilizado en el registro de la web.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  required: true
+                  description: Nombre del cliente
+                apellido:
+                  type: string
+                  required: true
+                  description: Apellido del cliente
+                email:
+                  type: string
+                  required: true
+                  description: Mail del cliente
+                password:
+                  type: string
+                  required: true
+                  description: Contraseña de la cuenta
+                telefono:
+                  type: string
+                  required: true
+                  description: Teléfono del cliente
+      responses:
+        '200':
+          description: Genera el usuario y muestra una confirmación.
+        '400':
+          description: Faltan datos obligatorios | Ya existe un usuario con el mail ingresado
+  /users/{id}:
+    get:
+      summary: Devuelve los datos de un usuario de la plataforma (REQUIERE ADMINISTRADOR)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID del cliente solicitado
+      tags:
+        - Clientes y Usuarios
+      responses:
+        '200':
+          description: Devuelve la información de un usuario.
+        '400':
+          description: Error al consultar el usuario.
+        '403':
+          description: El usuario no tiene los permisos requeridos (debe ser administrador).
+    post:
+      tags:
+        - Clientes y Usuarios
+      summary: Actualiza los datos de un usuario de la plataforma
+      parameters:
+        - in: path
+          name: id
+          description: ID del usuario a actualizar
+          required: true
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  required: true
+                  description: Nombre del cliente
+                apellido:
+                  type: string
+                  required: true
+                  description: Apellido del cliente
+                email:
+                  type: string
+                  required: true
+                  description: Mail del cliente
+                telefono:
+                  type: string
+                  required: true
+                  description: Teléfono del cliente
+      responses:
+        '200':
+          description: Genera el usuario y muestra una confirmación.
+        '400':
+          description: Faltan datos obligatorios
+        '403':
+          description: El usuario no tiene los permisos requeridos (debe ser administrador).
+        '500':
+          description: Ya existe un usuario con el mail ingresado | Error al actualizar el usuario
+  /users/{id}/enable:
+    get:
+      summary: Habilita un usuario en la plataforma (REQUIERE ADMINISTRADOR)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID del usuario a habilitar
+      tags:
+        - Clientes y Usuarios
+      responses:
+        '200':
+          description: Confirma la habilitación.
+        '500':
+          description: Error al habilitar el usuario.
+        '403':
+          description: El usuario no tiene los permisos requeridos (debe ser administrador).
+  /users/{id}/disable:
+    get:
+      summary: Deshabilita un usuario en la plataforma (REQUIERE ADMINISTRADOR)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID del usuario a deshabilitar
+      tags:
+        - Clientes y Usuarios
+      responses:
+        '200':
+          description: Confirma la deshabilitación.
+        '500':
+          description: Error al deshabilitar el usuario.
+        '403':
+          description: El usuario no tiene los permisos requeridos (debe ser administrador).
+  /users/{id}/cambiarClave:
+    post:
+      tags:
+        - Clientes y Usuarios
+      summary: Cambia la clave de un usuario (REQUIERE SESIÓN DE ADMINISTRADOR)
+      parameters:
+        - in: path
+          name: id
+          description: ID del usuario al que se le cambiará la contraseña.
+          required: true
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  required: true
+                  description: Nueva contraseña de la cuenta
+      responses:
+        '200':
+          description: Actualiza la contraseña de la cuenta y muestra una confirmación.
+        '400':
+          description: Faltan datos obligatorios
+        '403':
+          description: El usuario no tiene los permisos requeridos (debe ser administrador).
+  /users/registrar:
+    post:
+      tags:
+        - Clientes y Usuarios
+      summary: Registra un nuevo usuario en la plataforma, puede ser de tipo cliente o administrador (REQUIERE SESIÓN DE ADMINISTRADOR)
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  required: true
+                  description: Nombre del cliente
+                apellido:
+                  type: string
+                  required: true
+                  description: Apellido del cliente
+                email:
+                  type: string
+                  required: true
+                  description: Mail del cliente
+                password:
+                  type: string
+                  required: true
+                  description: Contraseña de la cuenta
+                telefono:
+                  type: string
+                  required: true
+                  description: Teléfono del cliente
+                isAdmin:
+                  type: integer
+                  required: true
+                  description: Tipo de usuario (0 cliente | 1 administrador)
+                  enum: [ 0, 1 ]
+      responses:
+        '200':
+          description: Genera la categoría y retorna su ID.
+        '400':
+          description: Faltan datos obligatorios | Ya existe un usuario con el mail ingresado
+        '403':
+          description: El usuario no tiene los permisos requeridos (debe ser administrador).

@@ -29,7 +29,9 @@
     "mysql": "^2.18.1",
     "mysql2": "^3.6.0",
     "sequelize": "^6.32.1",
-    "sequelize-fixtures": "^1.2.0"
+    "sequelize-fixtures": "^1.2.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
     "sequelize-cli": "^6.6.1"

@@ -1,0 +1,106 @@
+# El patrón del hard | Backend
+
+## Instalación 
+### Pre-requisitos:
+
+* NodeJS y NPM instalados en el dispositivo.
+* sequelize-cli instalado ``` npm install --save-dev sequelize-cli ```
+* MySQL / MariaDB instalado en el dispositivo.
+* Base de datos creada con un nombre determinado, que deberá corresponder al que sea configurado posteriormente en el archivo /config/config.json
+
+### Procedimiento de instalación:
+
+1. Clonar el repositorio de backend desde https://github.com/francobidart/dsw-tp-backend
+2. Ingresar al directorio de backend y ejecutar el comando ``` npm install ```
+3. Configurar los datos USERNAME, PASSWORD, DATABASE Y PORT en el archivo /config/config.json con los datos correspondientes a la base de datos.
+4. Ejecutar las migraciones para crear la estructura básica de datos con ``` sequelize-cli db:migrate ```
+
+
+#### Instalación de información de prueba
+
+En este proyecto se encuentra incluida una herramienta que permite la instalación de datos de prueba en la base de datos.
+
+**Importante:** La utilización de esta herramienta borrará la información que se encuentra almacenada actualmente en la 
+base de datos, se recomienda utilizarla solo en caso de querer hacer pruebas básicas de funcionalidad sin tener que hacer
+flujos completos.
+
+Para cargar los datos de prueba es **necesario** que la base de datos se encuentre creada (no es necesario que contenga información).
+
+Para utilizar la herramienta deberá ejecutar el siguiente comando en el directorio raíz del proyecto backend:
+
+```
+node fixtures/loadTest.js
+```
+
+Al finalizar la ejecución, la base de datos habrá sido creada nuevamente, las migraciones habrán sido aplicadas y se incluirán datos
+de prueba para los siguientes elementos:
+
+* Usuarios de prueba
+  * Cliente: 
+    * Usuario: **test@test.com**
+    * Contraseña: **admin**
+  * Administrador: 
+    * Usuario: **admin@test.com**
+    * Contraseña: **admin**
+* Categorías de producto:
+  * Procesadores
+  * Discos sólidos
+  * Memorias RAM
+  * Otros
+* Medios de pago
+  * Efectivo
+  * Transferencia bancaria
+* Productos de prueba (4)
+* Sucursales (2)
+* Estados de pedido
+  * Generado
+  * Pendiente de pago
+  * Cobrado (pendiente de entrega)
+  * Entregado
+  * Cancelado
+
+Con esta información inicial es posible lanzar la aplicación y ejecutar los diferentes casos de uso disponibles:
+
+* Registro de usuarios
+* Login/logout
+* Listado de productos
+* Búsqueda de productos
+* Comprar productos
+* Ver información de pedidos
+* Acceder al administrador, con las siguientes funciones
+  * ABM Productos
+  * ABM Sucursales
+  * ABM Medios de Pago
+  * Listado de pedidos
+    * Entrega de pedidos
+    * Cancelación de pedidos
+  * ABM Usuarios
+
+### Ejecución de la aplicación
+
+Para ejecutar la aplicación, luego de realizada la carga inicial de datos, deberá ejecutar el siguiente comando desde el directorio raíz del proyecto de backend:
+
+```
+node app.js
+```
+
+Por defecto, y si el puerto se encuentra disponible, el servidor de backend se ejecutará en http://localhost:3000
+
+### Consideraciones acerca de CORS y politicas de acceso
+
+Es importante aclarar que la aplicación se encuentra protegida por politicas CORS, los origenes permitidos se encuentran definidos en el archivo /app.js dentro de la variable _corsOptions_.
+
+Los valores permitidos por defecto son:
+
+* **localhost:4200** (Puerto por defecto de Angular).
+* **localhost:3000** (Puerto por defecto de backend, habilitado para el correcto funcionamiento de Swagger UI).
+
+De ser necesario, realice los ajustes necesarios para la correcta ejecución de la aplicación desde la variable mencionada anteriormente.
+
+### Documentación de API:
+
+Utilizamos Swagger UI para la documentación de APIs, se encuentra disponible 
+al correr la aplicación en la ruta /api-docs
+
+http://localhost:3000/api-docs
+

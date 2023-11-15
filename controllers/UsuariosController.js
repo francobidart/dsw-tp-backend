@@ -6,6 +6,7 @@ const {buildResponse, errorResponse} = require("../utils/Utils");
 const jwt = require("jsonwebtoken");
 const {jwtSecret, jwtPrivateKey} = require("../config/sec");
 const fs = require("fs");
+const {toBoolean} = require("validator");
 
 module.exports = {
     async create(req, res) {
@@ -29,7 +30,9 @@ module.exports = {
         let createAdminUser = false;
 
         if (res.locals.isAdmin) {
-            if (values.isAdmin) {
+            if (toBoolean(values.isAdmin)) {
+                console.log(values)
+                console.log(values.isAdmin)
                 createAdminUser = true;
             }
         }
@@ -47,7 +50,8 @@ module.exports = {
                     telefono: values.telefono,
                     usuario: values.usuario,
                     clave: hash,
-                    isAdmin: createAdminUser
+                    isAdmin: createAdminUser,
+                    active: 1
                 })
                 .then(Usuarios => {
                     res.status(200).send(buildResponse(null, 'Usuario registrado correctamente'))
@@ -72,7 +76,10 @@ module.exports = {
                 id: req.params.id
             }
         })
-            .then(Usuarios => res.status(200).send(buildResponse(Usuarios)))
+            .then(Usuarios => {
+                Usuarios.clave = '';
+                res.status(200).send(buildResponse(Usuarios))
+            })
             .catch(error => res.status(400).send(errorResponse(error)))
     },
 
@@ -237,6 +244,17 @@ module.exports = {
     },
 
     async changeUserPassword(req, res) {
+
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            let errores = '';
+            for (let error of errors.errors) {
+                errores += error.msg + ' / '
+            }
+            return res.status(400).json(errorResponse(errores));
+        }
+
         const usuarioActual = await Usuarios.findOne({
             where: {
                 id: req.params.id

@@ -15,7 +15,7 @@ var con = mysql.createConnection({
 
 con.connect(function (err) {
     if (err) throw 'Error al conectarse a la DB';
-    var query = "DROP DATABASE " + config.development.database;
+    var query = "DROP DATABASE IF EXISTS " + config.development.database;
     var queryCreate = "CREATE DATABASE " + config.development.database;
     con.query(query, function (err, result) {
         if (err) throw err;
