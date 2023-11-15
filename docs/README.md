@@ -22,9 +22,8 @@
 
 En este proyecto se encuentra incluida una herramienta que permite la instalación de datos de prueba en la base de datos.
 
-**Importante:** La utilización de esta herramienta borrará la información que se encuentra almacenada actualmente en la 
-base de datos, se recomienda utilizarla solo en caso de querer hacer pruebas básicas de funcionalidad sin tener que hacer
-flujos completos.
+**Importante:** La utilización de esta herramienta **borrará la información que se encuentra almacenada actualmente** en la 
+base de datos.
 
 Para cargar los datos de prueba es **necesario** que la base de datos se encuentre creada (no es necesario que contenga información).
 
