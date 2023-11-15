@@ -44,11 +44,11 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 // Configuración de CORS
 
-var whitelist = ['http://localhost:4200', 'http://localhost:3000']
+var whitelist = ['http://localhost:4200']
 var corsOptions = {
     credentials: true,
     origin: function (origin, callback) {
-        if (whitelist.indexOf(origin) !== -1) {
+        if (!origin || whitelist.indexOf(origin) !== -1) {
             callback(null, true)
         } else {
             callback(new Error('Origen no permitido por CORS'))

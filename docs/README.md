@@ -8,6 +8,8 @@
 * MySQL / MariaDB instalado en el dispositivo.
 * Base de datos creada con un nombre determinado, que deberá corresponder al que sea configurado posteriormente en el archivo /config/config.json
 
+---
+
 ### Procedimiento de instalación:
 
 1. Clonar el repositorio de backend desde https://github.com/francobidart/dsw-tp-backend
@@ -76,6 +78,8 @@ Con esta información inicial es posible lanzar la aplicación y ejecutar los di
     * Cancelación de pedidos
   * ABM Usuarios
 
+---
+
 ### Ejecución de la aplicación
 
 Para ejecutar la aplicación, luego de realizada la carga inicial de datos, deberá ejecutar el siguiente comando desde el directorio raíz del proyecto de backend:
@@ -93,14 +97,51 @@ Es importante aclarar que la aplicación se encuentra protegida por politicas CO
 Los valores permitidos por defecto son:
 
 * **localhost:4200** (Puerto por defecto de Angular).
-* **localhost:3000** (Puerto por defecto de backend, habilitado para el correcto funcionamiento de Swagger UI).
 
 De ser necesario, realice los ajustes necesarios para la correcta ejecución de la aplicación desde la variable mencionada anteriormente.
+
+---
 
 ### Documentación de API:
 
 Utilizamos Swagger UI para la documentación de APIs, se encuentra disponible 
 al correr la aplicación en la ruta /api-docs
 
-http://localhost:3000/api-docs
+Se encuentran documentados todos los endpoints disponibles, agrupados por el tipo
+de request. 
 
+Las opciones disponibles son:
+
+* Sesión
+* Productos
+* Categorías
+* Sucursales
+* Medios de pago
+* Pedidos
+* Clientes y usuarios
+
+### IMPORTANTE
+
+La aplicación utiliza autorización por JWT, almacenados en una cookie que se envía al iniciar sesión.
+
+Es importante para poder utilizar correctamente los endpoints se realice previamente el login correspondiente, para hacerlo deberá:
+
+1. Ingresar a Swagger UI en http://localhost:3000/api-docs
+2. Expandir la sección "Sesión"
+3. Expandir el endpoint POST /login
+4. Seleccionar "Try it out"
+5. Ingresar un usuario y contraseña (utilizar como referencia los mencionados anteriormente)
+6. Seleccionar "Execute"
+7. Verificar que la respuesta indique _Usuario identificado correctamente_
+
+Una vez realizada la autenticación, podrá utilizar los endpoints que requieran autorización.
+
+Algunos endpoints solo permiten el acceso con usuarios administradores. En caso de que se haya logueado con un usuario cliente, puede utilizar el endpoint _GET /logout_ para finalizar la sesión e ingresar con el usuario adecuado.
+
+En caso de no haber ingresado con un usuario administrador, estas rutas enviarán la siguiente respuesta:
+
+```
+{
+  mensaje: 'El usuario no posee los permisos requeridos para acceder a este recurso.'
+}
+```
