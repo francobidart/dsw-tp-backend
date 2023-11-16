@@ -27,8 +27,8 @@ module.exports = {
                 descripcion: req.body.descripcion,
                 stock: req.body.stock
             })
-            .then(Producto => res.status(200).send(Producto))
-            .catch(error => res.status(400).send(error))
+            .then(Producto => res.status(200).send(buildResponse(Producto, 'Producto registrado correctamente')))
+            .catch(error => res.status(400).send(errorResponse(error)))
     },
 
     async update(req, res) {
@@ -94,7 +94,7 @@ module.exports = {
         });
     },
 
-    list(req, res) {
+    async list(req, res) {
         let whereOptions = {
             activo: true
         }

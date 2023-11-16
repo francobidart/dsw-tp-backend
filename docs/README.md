@@ -20,20 +20,22 @@
 
 #### Instalación de información de prueba
 
-En este proyecto se encuentra incluida una herramienta que permite la instalación de datos de prueba en la base de datos.
+En este proyecto se encuentra incluido un conjunto de datos iniciales útiles para la realización de pruebas.
 
 **Importante:** La utilización de esta herramienta **borrará la información que se encuentra almacenada actualmente** en la 
 base de datos.
 
 Para cargar los datos de prueba es **necesario** que la base de datos se encuentre creada (no es necesario que contenga información).
 
-Para utilizar la herramienta deberá ejecutar el siguiente comando en el directorio raíz del proyecto backend:
+Para utilizar la herramienta deberá ejecutar los siguientes comandos en el directorio raíz del proyecto backend:
 
 ```
-node fixtures/loadTest.js
+npx sequelize-cli db:migrate:undo:all
+npx sequelize-cli db:migrate
+npx sequelize-cli db:seed:all
 ```
 
-Al finalizar la ejecución, la base de datos habrá sido creada nuevamente, las migraciones habrán sido aplicadas y se incluirán datos
+Al finalizar la ejecución, la estructura de datos habrá sido creada nuevamente, las migraciones habrán sido aplicadas y se incluirán datos
 de prueba para los siguientes elementos:
 
 * Usuarios de prueba
@@ -98,7 +100,7 @@ Los valores permitidos por defecto son:
 * **localhost:4200** (Puerto por defecto de Angular).
 * **localhost:3000** (Puerto por defecto de Express).
 
-De ser necesario, realice los ajustes necesarios para la correcta ejecución de la aplicación desde la variable mencionada anteriormente.
+De ser necesario, realice los ajustes correspondientes para la correcta ejecución de la aplicación desde la variable mencionada anteriormente.
 
 ---
 
@@ -145,3 +147,28 @@ En caso de no haber ingresado con un usuario administrador, estas rutas enviará
   mensaje: 'El usuario no posee los permisos requeridos para acceder a este recurso.'
 }
 ```
+
+---
+
+### Tests automáticos de backend
+
+Utilizamos las siguientes librerías para la definición de pruebas automatizadas
+* Jest
+* Supertest
+
+Se definió un conjunto básico de 6 pruebas, que verifican los siguientes elementos:
+
+* Peticiones GET sin autorización, a endpoints de Productos y Categorías
+* Peticiones POST para el manejo de sesiones, login de usuarios
+* Peticiones POST para el registro de un producto, con autenticación de administrador.
+
+Para ejecutar las pruebas se utilizan los datos iniciales mencionados previamente, para ejecutar los tests realice el siguiente comando en la carpeta
+raíz del proyecto backend:
+
+```
+npm test
+```
+
+#### Imagen de verificación de resultados de la ejecución de las pruebas:
+
+![image](./img/resultados_test_backend.png)

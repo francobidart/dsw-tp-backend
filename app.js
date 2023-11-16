@@ -48,7 +48,6 @@ var whitelist = ['http://localhost:4200', 'http://localhost:3000']
 var corsOptions = {
     credentials: true,
     origin: function (origin, callback) {
-        console.log(origin)
         if (!origin || whitelist.indexOf(origin) !== -1) {
             callback(null, true)
         } else {
@@ -205,6 +204,9 @@ app.post('*', function (req, res) {
     res.status(404).send(errorResponse('404 - Not Found'));
 });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`DSW TP Backend se está ejecutando en el puerto ${port}`)
 })
+
+// Export utilizado para los tests.
+module.exports = server;

@@ -350,7 +350,7 @@ module.exports = {
                 }
             }
         })
-        response.importeVentasMensuales = ventasTotales;
+        response.importeVentasMensuales = ventasTotales ? ventasTotales : 0;
         response.cantidadPedidosPendientes = cantidadPedidos;
         response.cantidadPedidosMes = ventasDelMes;
         res.status(200).send(buildResponse(response))
