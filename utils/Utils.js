@@ -25,7 +25,8 @@ module.exports = {
             const token = jwt.verify(authHeader, jwtSecret);
             const user = await Usuarios.findOne({
                 where: {
-                    id: token.user
+                    id: token.user,
+                    active: 1
                 }
             })
             res.locals.user = user.id;
@@ -42,11 +43,11 @@ module.exports = {
             const authHeader = req.cookies['tk'];
             if (authHeader == null) return res.status(401).send({mensaje: 'El token de autorización no fue enviado a la aplicación'});
             const token = jwt.verify(authHeader, jwtSecret);
-            console.log(token)
             const user = await Usuarios.findOne({
                 where: {
                     id: token.user,
-                    isAdmin: true
+                    isAdmin: true,
+                    active: 1
                 }
             })
             res.locals.user = user.id;
@@ -55,6 +56,39 @@ module.exports = {
             next();
         } catch {
             return res.status(403).send({mensaje: 'El usuario no posee los permisos requeridos para acceder a este recurso.'})
+        }
+    },
+
+    async injectIsAdmin(req, res, next) {
+        try {
+            const authHeader = req.cookies['tk'];
+
+            res.locals.isAdmin = false;
+            res.locals.user = null;
+
+            if (authHeader) {
+                const token = jwt.verify(authHeader, jwtSecret);
+
+                if (token) {
+                    const user = await Usuarios.findOne({
+                        where: {
+                            id: token.user,
+                            isAdmin: true,
+                            active: 1
+                        }
+                    });
+
+                    if (user) {
+                        res.locals.user = user.id;
+                        res.locals.isAdmin = true;
+                    }
+                }
+            }
+
+            next();
+        } catch (ex) {
+            res.locals.isAdmin = false;
+            next();
         }
     }
 }

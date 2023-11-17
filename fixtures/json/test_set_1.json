@@ -8,7 +8,8 @@
       "usuario": "juancarlos",
       "clave": "$2a$12$TTk.q4Gez2E1WqDVV9SSd.9Lxdd4jMo6Fs8ngYmnodQb5lAz7iEAe",
       "telefono": "3410000000",
-      "isAdmin": 0
+      "isAdmin": 0,
+      "active": 1
     }
   },
     {
@@ -20,7 +21,8 @@
       "usuario": "admin",
       "clave": "$2a$12$TTk.q4Gez2E1WqDVV9SSd.9Lxdd4jMo6Fs8ngYmnodQb5lAz7iEAe",
       "telefono": "3410000000",
-      "isAdmin": 1
+      "isAdmin": 1,
+      "active": 1
     }
   },
   {
@@ -63,15 +65,17 @@
     "data": {
       "id": 1,
       "tag": "efectivo",
-      "nombre": "Pago en efectivo"
+      "nombre": "Pago en efectivo",
+      "active": 1
     }
   },
   {
     "model": "MedioPago",
     "data": {
       "id": 2,
-      "tag": "mercado_pago",
-      "nombre": "Mercado Pago"
+      "tag": "transferencia",
+      "nombre": "Transferencia bancaria",
+      "active": 1
     }
   },
   {
@@ -124,7 +128,8 @@
       "id": 1,
       "nombre": "Centro",
       "direccion": "Zeballos 1341 | Rosario | Santa Fe",
-      "telefono": "341000010"
+      "telefono": "341000010",
+      "active": 1
     }
   },
   {
@@ -133,7 +138,8 @@
       "id": 2,
       "nombre": "Norte",
       "direccion": "Thedy 100 | Rosario | Santa Fe",
-      "telefono": "341000010"
+      "telefono": "341000010",
+      "active": 1
     }
   },
   {

@@ -33,6 +33,10 @@ module.exports = (sequelize, DataTypes) => {
                 foreignKey: 'medioDePago',
                 as: 'medioDePagoPedido'
             })
+            this.belongsTo(models.Sucursal, {
+                foreignKey: 'sucursal',
+                as: 'sucursalPedido'
+            })
         }
     }
 
@@ -56,6 +60,10 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         },
         medioDePago: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        sucursal: {
             type: DataTypes.INTEGER,
             allowNull: false
         }

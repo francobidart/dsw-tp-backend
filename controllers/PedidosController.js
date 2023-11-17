@@ -9,10 +9,15 @@ const DetallePedido = require('../models').DetallePedido;
 const HistorialEstadoPedido = require('../models').HistorialEstadoPedido;
 const EstadoPedido = require('../models').EstadoPedido;
 const MedioPago = require('../models').MedioPago;
+const Sucursal = require('../models').Sucursal;
 const {sequelize} = require('../models');
 
 module.exports = {
     async create(req, res) {
+        if (res.locals.isAdmin) {
+            res.status(500).send(errorResponse('Para realizar una compra, deberás ingresar con un usuario de tipo CLIENTE, los administradores no pueden realizar compras en la plataforma.'))
+            return;
+        }
         const pedido = req.body;
         if ((!pedido.articulos || pedido.articulos.length === 0) || !pedido.sucursal || !pedido.mediodepago) {
             res.status(500).send(errorResponse('Faltan datos obligatorios para el pedido.'))
@@ -25,6 +30,7 @@ module.exports = {
                 }
                 const nuevoPedido = await Pedido.create({
                     cliente: res.locals.user,
+                    sucursal: pedido.sucursal,
                     montoTotal: montoTotal,
                     medioDePago: pedido.mediodepago
                 })
@@ -39,9 +45,14 @@ module.exports = {
                         where: {
                             id: articulo.id
                         },
-                        attributes: ['id', 'stock', 'nombre'],
+                        attributes: ['id', 'stock', 'nombre', 'precio'],
                         transaction: t
                     })
+
+                    if (inventarioActual.dataValues.precio != articulo.precio) {
+                        throw 'El precio del artículo es diferente al actual, reintentá la compra.'
+                    }
+
                     let cantidad = 1;
 
                     if (cantidad > parseFloat(inventarioActual.dataValues.stock)) {
@@ -95,6 +106,7 @@ module.exports = {
             await t.commit();
 
             res.status(200).send(buildResponse(pedido, 'Pedido entregado correctamente!'));
+
         } catch (error) {
             let mensaje = 'Ocurrió un error: ' + error;
             await t.rollback();
@@ -109,8 +121,30 @@ module.exports = {
                 where: {
                     id: req.params.id
                 },
+                include: [
+                    {
+                        model: DetallePedido,
+                        attributes: ['articulo', 'cantidad'],
+                        as: 'detallePedido'
+                    }
+                ],
                 transaction: t
             })
+
+            for (var i = 0; i < pedido.dataValues.detallePedido.length; i++) {
+                let detallePedido = pedido.dataValues.detallePedido[i].dataValues;
+                const productoActualizarStock = await Producto.findOne({
+                    where: {
+                        id: detallePedido.articulo
+                    },
+                    transaction: t
+                });
+                productoActualizarStock.set({
+                    stock: parseFloat(productoActualizarStock.stock) + parseFloat(detallePedido.cantidad)
+                })
+                await productoActualizarStock.save({transaction: t})
+            }
+
             pedido.set('estadoActual', 5);
             await pedido.save({transaction: t});
             const historialEstado = await HistorialEstadoPedido.create({
@@ -121,6 +155,7 @@ module.exports = {
             await t.commit();
 
             res.status(200).send(buildResponse(pedido, 'Pedido cancelado correctamente!'));
+
         } catch (error) {
             let mensaje = 'Ocurrió un error: ' + error;
             await t.rollback();
@@ -134,11 +169,16 @@ module.exports = {
                 id: req.params.id
             }
         })
-        if (pedido.estadoActual !== 4 && pedido.estadoActual !== 5) {
-            next()
+        if (pedido) {
+            if (pedido.estadoActual !== 4 && pedido.estadoActual !== 5) {
+                next()
+            } else {
+                res.status(500).send(errorResponse('No es realizar esta acción un pedido que se encuentra en estado ENTREGADO o CANCELADO'));
+            }
         } else {
-            res.status(500).send(errorResponse('No es realizar esta acción un pedido que se encuentra en estado ENTREGADO o CANCELADO'));
+            res.status(404).send(errorResponse('Pedido no encontrado'));
         }
+
     },
 
     async getById(req, res) {
@@ -180,6 +220,13 @@ module.exports = {
                     model: MedioPago,
                     as: 'medioDePagoPedido',
                     attributes: ['nombre', 'tag', 'id']
+                },
+                {
+                    model: Sucursal,
+                    as: 'sucursalPedido',
+                    attributes: {
+                        exclude: ['createdAt', 'updatedAt', 'active']
+                    }
                 }
             ]
         });
@@ -194,7 +241,7 @@ module.exports = {
                 }
             }
         } else {
-            res.status(500).send(errorResponse('No encontrado'));
+            res.status(404).send(errorResponse('No encontrado'));
         }
     },
 
@@ -240,6 +287,13 @@ module.exports = {
                     model: MedioPago,
                     as: 'medioDePagoPedido',
                     attributes: ['nombre', 'tag', 'id']
+                },
+                {
+                    model: Sucursal,
+                    as: 'sucursalPedido',
+                    attributes: {
+                        exclude: ['createdAt', 'updatedAt', 'active']
+                    }
                 }
             ],
             attributes: {exclude: ['cliente']}
@@ -250,28 +304,6 @@ module.exports = {
             .catch(error => res.status(400).send(errorResponse(error)))
     },
 
-    findByCat(req, res) {
-        let page = req.query.page ? req.query.page : 0;
-        let limit = 10000;
-        let categoria = req.params.id;
-        let offset = page * limit;
-        return Producto.findAndCountAll({
-            limit: limit,
-            offset: offset,
-            where: {categoria: categoria, stock: {[Op.gt]: 0}},
-            include: [
-                {
-                    model: TipoProducto
-                },
-                {
-                    model: DetallePedido,
-                    as: 'detallePedido'
-                }
-            ]
-        })
-            .then(Producto => res.status(200).send(buildResponse(Producto.rows)))
-            .catch(error => res.status(400).send(errorResponse(error)))
-    },
     find(req, res) {
         return Producto.findAll({
             where: {
@@ -282,7 +314,7 @@ module.exports = {
             .catch(error => res.status(400).send(error))
     },
 
-    async listPedidosNoEntregados(req, res) {
+    async statsPedidos(req, res) {
 
         const fechaActual = new Date();
         const primerDiaMes = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), 1);
@@ -311,14 +343,14 @@ module.exports = {
             }
         })
 
-        let ventasDelMes = await Pedido.count( {
+        let ventasDelMes = await Pedido.count({
             where: {
                 createdAt: {
                     [Op.between]: [primerDiaMes, ultimoDiaMes]
                 }
             }
         })
-        response.importeVentasMensuales = ventasTotales;
+        response.importeVentasMensuales = ventasTotales ? ventasTotales : 0;
         response.cantidadPedidosPendientes = cantidadPedidos;
         response.cantidadPedidosMes = ventasDelMes;
         res.status(200).send(buildResponse(response))

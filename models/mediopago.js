@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
         tag: {type: DataTypes.STRING, unique: true},
         nombre: DataTypes.STRING,
         descripcion: DataTypes.STRING,
-
+        active: DataTypes.INTEGER
     }, {
         sequelize,
         modelName: 'MedioPago',

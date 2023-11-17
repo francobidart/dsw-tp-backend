@@ -6,9 +6,21 @@ const {buildResponse, errorResponse} = require("../utils/Utils");
 const jwt = require("jsonwebtoken");
 const {jwtSecret, jwtPrivateKey} = require("../config/sec");
 const fs = require("fs");
+const {toBoolean} = require("validator");
 
 module.exports = {
     async create(req, res) {
+
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            let errores = '';
+            for (let error of errors.errors) {
+                errores += error.msg + ' / '
+            }
+            return res.status(400).json(errorResponse(errores));
+        }
+
         let values = req.body;
 
         var user = await Usuarios.findOne({
@@ -17,8 +29,10 @@ module.exports = {
 
         let createAdminUser = false;
 
-        if(res.locals.isAdmin) {
-            if(values.isAdmin) {
+        if (res.locals.isAdmin) {
+            if (toBoolean(values.isAdmin)) {
+                console.log(values)
+                console.log(values.isAdmin)
                 createAdminUser = true;
             }
         }
@@ -26,7 +40,7 @@ module.exports = {
         var hash = bcrypt.hashSync(values.password, 10);
 
         if (user !== null) {
-            res.status(400).send({error: 'Ya existe un usuario registrado con ese email.'})
+            res.status(400).send(errorResponse('Ya existe un usuario registrado con el email ingresado.'))
         } else {
             return Usuarios
                 .create({
@@ -36,15 +50,23 @@ module.exports = {
                     telefono: values.telefono,
                     usuario: values.usuario,
                     clave: hash,
-                    isAdmin: createAdminUser
+                    isAdmin: createAdminUser,
+                    active: 1
                 })
-                .then(Usuarios => res.status(200).send(buildResponse(Usuarios)))
+                .then(Usuarios => {
+                    res.status(200).send(buildResponse(null, 'Usuario registrado correctamente'))
+                })
                 .catch(error => res.status(400).send(errorResponse(error)))
         }
     },
     list(req, res) {
         return Usuarios.findAll()
-            .then(Usuarios => res.status(200).send(buildResponse(Usuarios)))
+            .then(Usuarios => {
+                for (var i = 0; i < Usuarios.length; i++) {
+                    Usuarios[i].clave = ''
+                }
+                res.status(200).send(buildResponse(Usuarios))
+            })
             .catch(error => res.status(400).send(errorResponse(error)))
     },
 
@@ -54,7 +76,10 @@ module.exports = {
                 id: req.params.id
             }
         })
-            .then(Usuarios => res.status(200).send(buildResponse(Usuarios)))
+            .then(Usuarios => {
+                Usuarios.clave = '';
+                res.status(200).send(buildResponse(Usuarios))
+            })
             .catch(error => res.status(400).send(errorResponse(error)))
     },
 
@@ -69,29 +94,33 @@ module.exports = {
             if (user === null) {
                 res.status(500).send(errorResponse('Usuario o contraseña no encontrados'))
             } else {
-                bcrypt.compare(values.password, user.clave, function (err, result) {
-                    if (err) {
-                        res.status(500).send(errorResponse(err));
-                    }
-                    if (result) {
-                        user.clave = null;
-                        jwt.sign({
-                            user: user.id,
-                            email: user.email,
-                            isAdmin: user.isAdmin
-                        }, jwtSecret, {expiresIn: '1d'}, function (err, token) {
-                            if (err) {
-                                res.clearCookie('tk')
-                                res.status(500).json(errorResponse(err.toString()));
-                            } else {
-                                res.cookie('tk', token, {httpOnly: true});
-                                res.status(200).send(buildResponse({isAdmin: user.isAdmin}, 'Usuario identificado correctamente.'));
-                            }
-                        });
-                    } else {
-                        res.status(500).json(errorResponse('Contraseña invalida'));
-                    }
-                });
+                if (!user.active) {
+                    res.status(500).send(errorResponse('Usuario no habilitado'))
+                } else {
+                    bcrypt.compare(values.password, user.clave, function (err, result) {
+                        if (err) {
+                            res.status(500).send(errorResponse(err));
+                        }
+                        if (result) {
+                            user.clave = null;
+                            jwt.sign({
+                                user: user.id,
+                                email: user.email,
+                                isAdmin: user.isAdmin
+                            }, jwtSecret, {expiresIn: '1d'}, function (err, token) {
+                                if (err) {
+                                    res.clearCookie('tk')
+                                    res.status(500).json(errorResponse(err.toString()));
+                                } else {
+                                    res.cookie('tk', token, {httpOnly: true});
+                                    res.status(200).send(buildResponse({isAdmin: user.isAdmin}, 'Usuario identificado correctamente.'));
+                                }
+                            });
+                        } else {
+                            res.status(500).json(errorResponse('Contraseña invalida'));
+                        }
+                    });
+                }
             }
         } else {
             res.status(500).send(errorResponse('Faltan datos obligatorios'));
@@ -110,7 +139,8 @@ module.exports = {
             jwt.verify(req.cookies.tk, jwtSecret, null, async (err, token) => {
                 const user = await Usuarios.findOne({
                     where: {
-                        id: token.user
+                        id: token.user,
+                        active: 1
                     },
                     attributes: ['isAdmin']
                 });
@@ -129,6 +159,123 @@ module.exports = {
         }
     },
 
+    async updateUser(req, res) {
+        const usuarioActual = await Usuarios.findOne({
+            where: {
+                id: req.params.id
+            }
+        })
+
+        let email = usuarioActual.email;
+
+        if (usuarioActual.email !== req.body.email) {
+            const buscarUsuarioMail = await Usuarios.findOne({
+                where: {
+                    email: req.body.email
+                }
+            })
+            if (buscarUsuarioMail) {
+                res.status(500).send(errorResponse('Ya existe un usuario registrado para el mail ingresado'));
+                return;
+            } else {
+                email = req.body.email;
+            }
+        }
+
+        usuarioActual.set({
+            nombre: req.body.nombre,
+            apellido: req.body.apellido,
+            email: email,
+            telefono: req.body.telefono
+        })
+
+        const usuarioActualizado = await usuarioActual.save();
+
+        if (usuarioActualizado) {
+            res.status(200).send(buildResponse(null, 'Usuario actualizado correctamente'));
+        } else {
+            res.status(500).send(errorResponse('Ocurrió un error al actualizar el usuario'))
+        }
+    },
+
+    async disableUser(req, res) {
+        const usuarioActual = await Usuarios.findOne({
+            where: {
+                id: req.params.id
+            }
+        })
+
+        if (res.locals.user === parseInt(req.params.id)) {
+            res.status(500).send(errorResponse('No es posible deshabilitar tu propio usuario como administrador.'))
+            return;
+        }
+
+        usuarioActual.set({
+            active: 0
+        })
+
+        const usuarioActualizado = await usuarioActual.save();
+
+        if (usuarioActualizado) {
+            res.status(200).send(buildResponse(null, 'Usuario deshabilitado correctamente'));
+        } else {
+            res.status(500).send(errorResponse('Ocurrió un error al deshabilitar el usuario'))
+        }
+    },
+
+    async enableUser(req, res) {
+        const usuarioActual = await Usuarios.findOne({
+            where: {
+                id: req.params.id
+            }
+        })
+
+        usuarioActual.set({
+            active: 1
+        })
+
+        const usuarioActualizado = await usuarioActual.save();
+
+        if (usuarioActualizado) {
+            res.status(200).send(buildResponse(null, 'Usuario habilitado correctamente'));
+        } else {
+            res.status(500).send(errorResponse('Ocurrió un error al habilitar el usuario'))
+        }
+    },
+
+    async changeUserPassword(req, res) {
+
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            let errores = '';
+            for (let error of errors.errors) {
+                errores += error.msg + ' / '
+            }
+            return res.status(400).json(errorResponse(errores));
+        }
+
+        const usuarioActual = await Usuarios.findOne({
+            where: {
+                id: req.params.id
+            }
+        })
+
+        let nuevaClave = bcrypt.hashSync(req.body.password, 10);
+
+        usuarioActual.set({
+            clave: nuevaClave
+        })
+
+        const usuarioActualizado = await usuarioActual.save();
+
+        if (usuarioActualizado) {
+            res.status(200).send(buildResponse(null, 'Contraseña actualizada correctamente'));
+        } else {
+            res.status(500).send(errorResponse('Ocurrió un error al actualizar la contraseña del usuario'))
+        }
+    },
+
     async validateAdmin(req, res) {
         if (req.cookies.tk === undefined) {
             res.status(403).send(errorResponse('No iniciaste sesión'))
@@ -137,7 +284,8 @@ module.exports = {
                 const user = await Usuarios.findOne({
                     where: {
                         id: token.user,
-                        isAdmin: true
+                        isAdmin: true,
+                        active: 1
                     },
                     attributes: ['isAdmin']
                 });
@@ -167,7 +315,8 @@ module.exports = {
                 } else {
                     Usuarios.findOne({
                         where: {
-                            id: token.user
+                            id: token.user,
+                            active: 1
                         }
                     }).then(Usuario => {
                         Usuario.dataValues.clave = null;
@@ -180,9 +329,4 @@ module.exports = {
             });
         }
     }
-
-
-
-
-
 };
