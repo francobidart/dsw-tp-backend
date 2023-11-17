@@ -61,7 +61,6 @@ module.exports = {
         await queryInterface.bulkInsert('MedioPagos', [
             {
                 id: 1,
-                tag: 'efectivo',
                 nombre: 'Pago en efectivo',
                 active: 1,
                 createdAt: new Date(),
@@ -69,7 +68,6 @@ module.exports = {
             },
             {
                 id: 2,
-                tag: 'transferencia',
                 nombre: 'Transferencia bancaria',
                 active: 1,
                 createdAt: new Date(),
@@ -139,6 +137,12 @@ module.exports = {
             },
         ], {});
         await queryInterface.bulkInsert('EstadoPedidos', [
+            {
+                id: 1,
+                nombre: 'Generado',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
             {
                 id: 2,
                 nombre: 'Pendiente de pago',

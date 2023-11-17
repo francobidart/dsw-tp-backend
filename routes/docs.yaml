@@ -541,11 +541,6 @@ paths:
                   required: true
                   description: Nombre del medio de pago
                   default: Modo
-                tag:
-                  type: string
-                  required: true
-                  description: Tag del medio de pago
-                  default: modo
       responses:
         '200':
           description: Registra el medio de pago y retorna sus datos.
@@ -591,11 +586,6 @@ paths:
                   required: true
                   description: Nombre del medio de pago
                   default: Modo
-                tag:
-                  type: string
-                  required: true
-                  description: Tag del medio de pago
-                  default: modo
       responses:
         '200':
           description: Actualiza el medio de pago y retorna sus datos.

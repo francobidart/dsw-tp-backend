@@ -27,8 +27,7 @@ module.exports = {
         }
 
         const nuevoMedioDePago = await MedioPago.create({
-            nombre: req.body.nombre,
-            tag: req.body.tag,
+            nombre: req.body.nombre
         })
 
         if (nuevoMedioDePago) {
@@ -69,8 +68,7 @@ module.exports = {
         })
 
         medioDePago.set({
-            nombre: req.body.nombre,
-            tag: req.body.tag
+            nombre: req.body.nombre
         })
 
         const medioDePagoActualizado = await medioDePago.save();
@@ -133,7 +131,7 @@ module.exports = {
 
         return MedioPago.findAll({
             where: whereOptions,
-            attributes: {exclude: ['createdAt', 'updatedAt']}
+            attributes: {exclude: ['updatedAt']}
         })
             .then(MedioPago => res.status(200).send(buildResponse(MedioPago)))
             .catch(error => res.status(400).send(errorResponse(error)))
