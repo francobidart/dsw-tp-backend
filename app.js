@@ -136,14 +136,12 @@ app.get('/mediopago/', injectIsAdmin, MedioPagoController.list);
 app.post('/mediopago/', [
     authenticateAdmin,
     body('nombre').notEmpty().withMessage('El nombre del medio de pago es obligatorio'),
-    body('tag').notEmpty().withMessage('El tag del medio de pago es obligatorio'),
 ], MedioPagoController.create);
 
 app.get('/mediopago/:id', injectIsAdmin, MedioPagoController.find);
 app.post('/mediopago/:id', [
     authenticateAdmin,
     body('nombre').notEmpty().withMessage('El nombre del medio de pago es obligatorio'),
-    body('tag').notEmpty().withMessage('El tag del medio de pago es obligatorio'),
 ], MedioPagoController.update);
 app.get('/mediopago/:id/disable', authenticateAdmin, MedioPagoController.disable);
 app.get('/mediopago/:id/enable', authenticateAdmin, MedioPagoController.enable);

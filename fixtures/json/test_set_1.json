@@ -64,7 +64,6 @@
     "model": "MedioPago",
     "data": {
       "id": 1,
-      "tag": "efectivo",
       "nombre": "Pago en efectivo",
       "active": 1
     }
@@ -73,7 +72,6 @@
     "model": "MedioPago",
     "data": {
       "id": 2,
-      "tag": "transferencia",
       "nombre": "Transferencia bancaria",
       "active": 1
     }

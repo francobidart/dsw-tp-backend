@@ -219,7 +219,7 @@ module.exports = {
                 {
                     model: MedioPago,
                     as: 'medioDePagoPedido',
-                    attributes: ['nombre', 'tag', 'id']
+                    attributes: ['nombre', 'id']
                 },
                 {
                     model: Sucursal,
@@ -286,7 +286,7 @@ module.exports = {
                 {
                     model: MedioPago,
                     as: 'medioDePagoPedido',
-                    attributes: ['nombre', 'tag', 'id']
+                    attributes: ['nombre', 'id']
                 },
                 {
                     model: Sucursal,

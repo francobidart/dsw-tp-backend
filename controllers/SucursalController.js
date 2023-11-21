@@ -75,7 +75,7 @@ module.exports = {
         const sucursalActualizada = await sucursal.save();
 
         if (sucursalActualizada) {
-            res.status(200).send(buildResponse(nuevaSucursal, 'Sucursal actualizada correctamente'))
+            res.status(200).send(buildResponse(sucursalActualizada, 'Sucursal actualizada correctamente'))
         } else {
             res.status(400).send(errorResponse('Error al actualizar la sucursal'))
         }
@@ -134,7 +134,7 @@ module.exports = {
 
         return Sucursal.findAll({
             where: whereOptions,
-            attributes: {exclude: ['createdAt', 'updatedAt']}
+            attributes: {exclude: ['updatedAt']}
         })
             .then(Sucursal => res.status(200).send(buildResponse(Sucursal)))
             .catch(error => res.status(400).send(errorResponse(error)))

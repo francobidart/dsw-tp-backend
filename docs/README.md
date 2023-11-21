@@ -162,7 +162,7 @@ Se definió un conjunto básico de 6 pruebas, que verifican los siguientes eleme
 * Peticiones POST para el manejo de sesiones, login de usuarios
 * Peticiones POST para el registro de un producto, con autenticación de administrador.
 
-Para ejecutar las pruebas se utilizan los datos iniciales mencionados previamente, para ejecutar los tests realice el siguiente comando en la carpeta
+Para ejecutar las pruebas se utilizan los datos iniciales mencionados previamente **(se borrará la información actual de la base de datos)**, para ejecutar los tests realice el siguiente comando en la carpeta
 raíz del proyecto backend:
 
 ```
