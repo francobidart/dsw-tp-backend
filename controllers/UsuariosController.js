@@ -30,9 +30,7 @@ module.exports = {
         let createAdminUser = false;
 
         if (res.locals.isAdmin) {
-            if (toBoolean(values.isAdmin)) {
-                console.log(values)
-                console.log(values.isAdmin)
+            if (values.isAdmin == 1) {
                 createAdminUser = true;
             }
         }

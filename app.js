@@ -157,9 +157,6 @@ app.get('/pedidos/stats', authenticateAdmin, PedidosController.statsPedidos)
 app.get('/pedidos/entregar/:id', [authenticateAdmin, validarCambioEstadoPedido], PedidosController.entregarPedido)
 app.get('/pedidos/cancelar/:id', [authenticateAdmin, validarCambioEstadoPedido], PedidosController.cancelarPedido)
 
-// Clientes | Solo para administradores (requiere authenticateAdmin)
-
-app.get('/users', authenticateAdmin, usuarioController.list);
 app.post('/users', [
     body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
     body('apellido').notEmpty().withMessage('El apellido es obligatorio'),
@@ -167,10 +164,25 @@ app.post('/users', [
     body('password').notEmpty().withMessage('La clave es obligatoria'),
     body('telefono').notEmpty().withMessage('El telefono es obligatorio'),
 ], usuarioController.create);
-app.get('/users/:id', authenticateAdmin, usuarioController.find);
+
+// Clientes | Solo para administradores (requiere authenticateAdmin)
+
+app.get('/users', authenticateAdmin, usuarioController.list);
+app.get('/users/:id(\\d+)', authenticateAdmin, usuarioController.find);
 
 // Usuarios | Solo para administradores (requiere authenticateAdmin)
-app.post('/users/:id', [
+
+app.post('/users/registrar', [
+    authenticateAdmin,
+    body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
+    body('apellido').notEmpty().withMessage('El apellido es obligatorio'),
+    body('email').isEmail().withMessage('El email es obligatorio'),
+    body('password').notEmpty().withMessage('La clave es obligatoria'),
+    body('telefono').notEmpty().withMessage('El telefono es obligatorio'),
+    body('isAdmin').notEmpty().withMessage('El tipo de usuario es obligatorio'),
+], usuarioController.create);
+
+app.post('/users/:id(\\d+)', [
     authenticateAdmin,
     body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
     body('apellido').notEmpty().withMessage('El apellido es obligatorio'),
@@ -184,15 +196,6 @@ app.post('/users/:id/cambiarClave', [
     authenticateAdmin,
     body('password').notEmpty().withMessage('La nueva clave es obligatoria')
 ], usuarioController.changeUserPassword);
-app.post('/users/registrar', [
-    authenticateAdmin,
-    body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
-    body('apellido').notEmpty().withMessage('El apellido es obligatorio'),
-    body('email').isEmail().withMessage('El email es obligatorio'),
-    body('password').notEmpty().withMessage('La clave es obligatoria'),
-    body('telefono').notEmpty().withMessage('El telefono es obligatorio'),
-    body('isAdmin').notEmpty().withMessage('El tipo de usuario es obligatorio'),
-], usuarioController.create);
 // Configuración de rutas para errores
 app.get('*', function (req, res) {
     res.status(404).send(errorResponse('404 - Not Found'));
