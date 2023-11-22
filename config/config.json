@@ -1,23 +1,22 @@
 {
   "development": {
     "username": "root",
-
-    "password": "1234",
-    "database": "tp_dsw",
+    "password": "12345678",
+    "database": "tpdsw_epdh",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
   "test": {
     "username": "root",
-    "password": "1234",
-    "database": "tp_dsw",
+    "password": "12345678",
+    "database": "tpdsw_epdh",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
   "production": {
     "username": "root",
-    "password": "1234",
-    "database": "tp_dsw",
+    "password": "12345678",
+    "database": "tpdsw_epdh",
     "host": "127.0.0.1",
     "dialect": "mysql"
   }
