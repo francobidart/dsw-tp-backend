@@ -326,5 +326,45 @@ module.exports = {
                 }
             });
         }
-    }
+    },
+
+     async updateClient(req, res) {
+        const usuarioActual = await Usuarios.findOne({
+            where: {
+                id: res.locals.user
+            }
+        })
+
+        let email = usuarioActual.email;
+
+        if (usuarioActual.email !== req.body.email) {
+            const buscarUsuarioMail = await Usuarios.findOne({
+                where: {
+                    email: req.body.email
+                }
+            })
+            if (buscarUsuarioMail) {
+                res.status(500).send(errorResponse('Ya existe un usuario registrado para el mail ingresado'));
+                return;
+            } else {
+                email = req.body.email;
+            }
+        }
+
+        usuarioActual.set({
+            nombre: req.body.nombre,
+            apellido: req.body.apellido,
+            email: email,
+            telefono: req.body.telefono
+        })
+
+        const usuarioActualizado = await usuarioActual.save();
+
+        if (usuarioActualizado) {
+            res.status(200).send(buildResponse(null, 'Usuario actualizado correctamente'));
+        } else {
+            res.status(500).send(errorResponse('Ocurrió un error al actualizar el usuario'))
+        }
+    },
+
 };

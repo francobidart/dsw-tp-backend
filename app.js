@@ -75,6 +75,13 @@ app.get('/logout', usuarioController.logout);
 app.get('/session/validateSession', usuarioController.validateSession);
 app.get('/session/validateAdmin', usuarioController.validateAdmin);
 app.get('/account/profile', usuarioController.getLoggedAccountData);
+app.post('/account/profile', [
+    authenticateToken,
+    body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
+    body('apellido').notEmpty().withMessage('El apellido es obligatorio'),
+    body('email').isEmail().withMessage('El email es obligatorio'),
+    body('telefono').notEmpty().withMessage('El telefono es obligatorio'),
+], usuarioController.updateClient);
 
 // Productos
 app.get('/products/', injectIsAdmin, productoController.list);
@@ -196,6 +203,8 @@ app.post('/users/:id/cambiarClave', [
     authenticateAdmin,
     body('password').notEmpty().withMessage('La nueva clave es obligatoria')
 ], usuarioController.changeUserPassword);
+
+
 // Configuración de rutas para errores
 app.get('*', function (req, res) {
     res.status(404).send(errorResponse('404 - Not Found'));
