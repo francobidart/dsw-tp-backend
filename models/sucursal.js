@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
         active: DataTypes.INTEGER
     }, {
         sequelize,
-        tableName: 'sucursales',
+        tableName: 'Sucursales',
         modelName: 'Sucursal',
     });
     return Sucursal;

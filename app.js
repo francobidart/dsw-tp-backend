@@ -1,3 +1,5 @@
+const fs = require('fs');
+const https = require('https');
 const express = require('express')
 const models = require('./models');
 const productoController = require('./controllers/ProductoController');
@@ -24,6 +26,17 @@ const {auth} = require("mysql/lib/protocol/Auth");
 
 app.use(cookieParser());
 
+const privateKey = fs.readFileSync('/etc/letsencrypt/live/ecommerce.bgestion.com.ar/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/ecommerce.bgestion.com.ar/cert.pem', 'utf8');
+const ca = fs.readFileSync('/etc/letsencrypt/live/ecommerce.bgestion.com.ar/chain.pem', 'utf8');
+
+
+const credentials = {
+	key: privateKey,
+	cert: certificate,
+	ca: ca
+};
+
 // Configuración de swagger
 
 const swaggerOptions = {
@@ -44,7 +57,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 // Configuración de CORS
 
-var whitelist = ['http://localhost:4200', 'http://localhost:3000']
+var whitelist = ['http://localhost:4200', 'http://localhost:3000', 'http://ecommerce.bgestion.com.ar', 'http://ecommerce.bgestion.com.ar:3000', 'https://ecommerce.bgestion.com.ar', 'https://ecommerce.bgestion.com.ar:3001']
 var corsOptions = {
     credentials: true,
     origin: function (origin, callback) {
@@ -217,6 +230,12 @@ app.post('*', function (req, res) {
 const server = app.listen(port, () => {
     console.log(`DSW TP Backend se está ejecutando en el puerto ${port}`)
 })
+
+const httpsServer = https.createServer(credentials, app);
+
+httpsServer.listen(3001, () => {
+	console.log('DSW TP Backend SSL se está ejecutando en el puerto 3001');
+});
 
 // Export utilizado para los tests.
 module.exports = server;
