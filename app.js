@@ -132,6 +132,10 @@ app.post('/categories', [authenticateAdmin, body('nombre').notEmpty().withMessag
 app.post('/categories/:id/update', [authenticateAdmin, body('nombre').notEmpty().withMessage('El nombre es obligatorio')], tipoProductoController.update);
 app.get('/categories/:id/borrar', authenticateAdmin, tipoProductoController.delete);
 
+// Carrito
+
+app.post('/cart/updatePrices', productoController.getByCarrito)
+
 // Sucursales
 app.get('/sucursales/', injectIsAdmin, SucursalController.list);
 app.post('/sucursales/', [
