@@ -31,6 +31,20 @@ module.exports = {
             .catch(error => res.status(400).send(errorResponse(error)))
     },
 
+    async getByCarrito(req, res) {
+        const productos = await Producto.findAll({
+            where: {
+                id: {
+                    [Op.in]: req.body
+                }
+            }
+        })
+
+        if (productos) {
+            res.status(200).send(buildResponse(productos, 'Consultado correctamente'))
+        }
+    },
+
     async update(req, res) {
         const errors = validationResult(req);
 
