@@ -23,7 +23,7 @@ tags:
   - name: Clientes y Usuarios
     description: Endpoints para operaciones sobre clientes y usuarios de la plataforma.
 paths:
-  /login:
+  /sesion/login:
     post:
       tags:
         - Sesión
@@ -52,7 +52,7 @@ paths:
                 example: "tk=token_de_sesion; Path=/; HttpOnly"
         '500':
           description: Faltan datos obligatorios.
-  /logout:
+  /sesion/logout:
     get:
       tags:
         - Sesión
@@ -61,7 +61,7 @@ paths:
       responses:
         '200':
           description: Cierre de sesión exitoso
-  /session/validateSession:
+  /sesion/session/validateSession:
     get:
       tags:
         - Sesión
@@ -74,7 +74,7 @@ paths:
           description: Sesión no iniciada
         '500':
           description: Token no valido o usuario no habilitado
-  /session/validateAdmin:
+  /sesion/session/validateAdmin:
     get:
       tags:
         - Sesión
@@ -87,7 +87,7 @@ paths:
           description: Sesión no iniciada
         '500':
           description: Token no valido o usuario no habilitado
-  /account/profile:
+  /sesion/account/profile:
     get:
       tags:
         - Sesión
