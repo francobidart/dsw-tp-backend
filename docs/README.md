@@ -109,6 +109,12 @@ De ser necesario, realice los ajustes correspondientes para la correcta ejecuci�
 Utilizamos Swagger UI para la documentación de APIs, se encuentra disponible 
 al correr la aplicación en la ruta /api-docs
 
+---
+
+**NOTA:** En el entorno de producción el puerto para acceder al backend en forma segura es 3001, conformado de la siguiente forma: https://DOMINIO_APLICACION:3001/api-docs
+
+---
+
 Se encuentran documentados todos los endpoints disponibles, agrupados por el tipo
 de request. 
 
