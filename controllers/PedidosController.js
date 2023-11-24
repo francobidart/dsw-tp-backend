@@ -354,5 +354,74 @@ module.exports = {
         response.cantidadPedidosPendientes = cantidadPedidos;
         response.cantidadPedidosMes = ventasDelMes;
         res.status(200).send(buildResponse(response))
+    },
+
+
+     listClient(req, res) {
+    let page = req.query.page ? req.query.page : 0;
+    let limit = req.query.limit ? parseInt(req.query.limit) : 10000;
+    let offset = page * limit;
+
+    // Obtener el ID del cliente (puedes cambiar la propiedad según la estructura de tu objeto de usuario)
+    const clientId = res.locals.user.id;
+
+    let whereSettings = {};
+
+    // Agregar filtro por ID de cliente
+    if (!res.locals.isAdmin) {
+        whereSettings = {
+            cliente: clientId
+        };
     }
+
+    return Pedido.findAndCountAll({
+        limit: limit,
+        offset: offset,
+        where: whereSettings,
+        order: [
+            ['createdAt', 'DESC']
+        ],
+        include: [
+            {
+                model: DetallePedido,
+                include: {
+                    model: Producto,
+                    attributes: ['nombre', 'imagen'],
+                    as: 'detalleArticulo'
+                },
+                attributes: { exclude: ['id', 'createdAt', 'updatedAt', 'pedido', 'articulo'] },
+                as: 'detallePedido'
+            },
+            {
+                model: Usuarios,
+                as: 'clientePedido',
+                attributes: ['id', 'nombre', 'apellido', 'email']
+            },
+            {
+                model: EstadoPedido,
+                as: 'detalleEstadoActual',
+                attributes: ['nombre']
+            },
+            {
+                model: MedioPago,
+                as: 'medioDePagoPedido',
+                attributes: ['nombre', 'id']
+            },
+            {
+                model: Sucursal,
+                as: 'sucursalPedido',
+                attributes: {
+                    exclude: ['createdAt', 'updatedAt', 'active']
+                }
+            }
+        ],
+        attributes: { exclude: ['cliente'] }
+    })
+        .then(Pedido => {
+            res.status(200).send(buildResponse(Pedido.rows));
+        })
+        .catch(error => res.status(400).send(errorResponse(error)));
+}
+
+
 };

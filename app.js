@@ -83,144 +83,45 @@ app.get('/', authenticateAdmin, function (req, res) {
 });
 
 // Sesión
-app.post('/login', usuarioController.login);
-app.get('/logout', usuarioController.logout);
-app.get('/session/validateSession', usuarioController.validateSession);
-app.get('/session/validateAdmin', usuarioController.validateAdmin);
-app.get('/account/profile', usuarioController.getLoggedAccountData);
-app.post('/account/profile', [
-    authenticateToken,
-    body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
-    body('apellido').notEmpty().withMessage('El apellido es obligatorio'),
-    body('email').isEmail().withMessage('El email es obligatorio'),
-    body('telefono').notEmpty().withMessage('El telefono es obligatorio'),
-], usuarioController.updateClient);
+
+const sesionRoutes = require('./API_Routes/sesion');
+app.use('/sesion', sesionRoutes);
 
 // Productos
-app.get('/products/', injectIsAdmin, productoController.list);
-app.get('/products/disabled', authenticateAdmin, productoController.listDisabled);
-app.get('/products/search/', productoController.search);
-app.get('/products/:id', injectIsAdmin, productoController.find);
 
-// Productos | Solo para administradores (requiere authenticateAdmin)
-app.post('/products/:id', [
-    authenticateAdmin,
-    body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
-    body('categoria').isNumeric().withMessage('La categoría es obligatoria'),
-    body('precio').isNumeric().withMessage('El precio es obligatorio'),
-    body('stock').isNumeric().withMessage('El inventario es obligatorio'),
-], productoController.update);
+const productosRoutes = require('./API_Routes/products');
+app.use('/products', productosRoutes);
 
-app.post('/products', [
-    authenticateAdmin,
-    body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
-    body('categoria').isNumeric().withMessage('La categoría es obligatoria'),
-    body('precio').isNumeric().withMessage('El precio es obligatorio'),
-    body('stock').isNumeric().withMessage('El inventario es obligatorio'),
-], productoController.create);
-
-app.get('/products/:id/disable', authenticateAdmin, productoController.disableProduct)
-app.get('/products/:id/enable', authenticateAdmin, productoController.enableProduct)
 
 // Categorías
-app.get('/categories/', tipoProductoController.list);
-app.get('/categories/:id', tipoProductoController.find);
-app.get('/categories/:id/products', injectIsAdmin, productoController.findByCat);
 
-// Categorías | Solo para administradores (requiere authenticateAdmin)
-app.post('/categories', [authenticateAdmin, body('nombre').notEmpty().withMessage('El nombre es obligatorio'),], tipoProductoController.create);
-app.post('/categories/:id/update', [authenticateAdmin, body('nombre').notEmpty().withMessage('El nombre es obligatorio')], tipoProductoController.update);
-app.get('/categories/:id/borrar', authenticateAdmin, tipoProductoController.delete);
+const categoriasRoutes = require('./API_Routes/categorias');
+app.use('/categories', categoriasRoutes);
+
 
 // Carrito
 
 app.post('/cart/updatePrices', productoController.getByCarrito)
 
 // Sucursales
-app.get('/sucursales/', injectIsAdmin, SucursalController.list);
-app.post('/sucursales/', [
-    authenticateAdmin,
-    body('nombre').notEmpty().withMessage('El nombre de la sucursal es obligatorio'),
-    body('direccion').notEmpty().withMessage('La dirección de la sucursal es obligatoria'),
-    body('telefono').notEmpty().withMessage('El teléfono de la sucursal es obligatorio'),
-], SucursalController.create);
 
-app.get('/sucursales/:id', injectIsAdmin, SucursalController.find);
-app.post('/sucursales/:id', [
-    authenticateAdmin,
-    body('nombre').notEmpty().withMessage('El nombre de la sucursal es obligatorio'),
-    body('direccion').notEmpty().withMessage('La dirección de la sucursal es obligatoria'),
-    body('telefono').notEmpty().withMessage('El teléfono de la sucursal es obligatorio'),
-], SucursalController.update);
-app.get('/sucursales/:id/disable', SucursalController.disable);
-app.get('/sucursales/:id/enable', SucursalController.enable);
+const sucursalesRoutes = require('./API_Routes/sucursales');
+app.use('/sucursales', sucursalesRoutes);
 
 // Medios de pago
-app.get('/mediopago/', injectIsAdmin, MedioPagoController.list);
-app.post('/mediopago/', [
-    authenticateAdmin,
-    body('nombre').notEmpty().withMessage('El nombre del medio de pago es obligatorio'),
-], MedioPagoController.create);
 
-app.get('/mediopago/:id', injectIsAdmin, MedioPagoController.find);
-app.post('/mediopago/:id', [
-    authenticateAdmin,
-    body('nombre').notEmpty().withMessage('El nombre del medio de pago es obligatorio'),
-], MedioPagoController.update);
-app.get('/mediopago/:id/disable', authenticateAdmin, MedioPagoController.disable);
-app.get('/mediopago/:id/enable', authenticateAdmin, MedioPagoController.enable);
+const mediopagoRoutes = require('./API_Routes/mediopago');
+app.use('/mediopago', mediopagoRoutes);
 
 // Pedidos
 
-app.get('/pedidos', authenticateToken, PedidosController.list);
-app.get('/pedidos/:id(\\d+)', authenticateToken, PedidosController.getById);
-app.post('/pedidos/registrar', authenticateToken, PedidosController.create)
+const pedidosRoutes = require('./API_Routes/pedidos');
+app.use('/pedidos', pedidosRoutes);
 
-// Pedidos | Solo para administradores (requiere authenticateAdmin)
-app.get('/pedidos/stats', authenticateAdmin, PedidosController.statsPedidos)
-app.get('/pedidos/entregar/:id', [authenticateAdmin, validarCambioEstadoPedido], PedidosController.entregarPedido)
-app.get('/pedidos/cancelar/:id', [authenticateAdmin, validarCambioEstadoPedido], PedidosController.cancelarPedido)
+// Usuarios
 
-app.post('/users', [
-    body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
-    body('apellido').notEmpty().withMessage('El apellido es obligatorio'),
-    body('email').isEmail().withMessage('El email es obligatorio'),
-    body('password').notEmpty().withMessage('La clave es obligatoria'),
-    body('telefono').notEmpty().withMessage('El telefono es obligatorio'),
-], usuarioController.create);
-
-// Clientes | Solo para administradores (requiere authenticateAdmin)
-
-app.get('/users', authenticateAdmin, usuarioController.list);
-app.get('/users/:id(\\d+)', authenticateAdmin, usuarioController.find);
-
-// Usuarios | Solo para administradores (requiere authenticateAdmin)
-
-app.post('/users/registrar', [
-    authenticateAdmin,
-    body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
-    body('apellido').notEmpty().withMessage('El apellido es obligatorio'),
-    body('email').isEmail().withMessage('El email es obligatorio'),
-    body('password').notEmpty().withMessage('La clave es obligatoria'),
-    body('telefono').notEmpty().withMessage('El telefono es obligatorio'),
-    body('isAdmin').notEmpty().withMessage('El tipo de usuario es obligatorio'),
-], usuarioController.create);
-
-app.post('/users/:id(\\d+)', [
-    authenticateAdmin,
-    body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
-    body('apellido').notEmpty().withMessage('El apellido es obligatorio'),
-    body('email').isEmail().withMessage('El email es obligatorio'),
-    body('telefono').notEmpty().withMessage('El telefono es obligatorio'),
-], usuarioController.updateUser);
-
-app.get('/users/:id/enable', authenticateAdmin, usuarioController.enableUser);
-app.get('/users/:id/disable', authenticateAdmin, usuarioController.disableUser);
-app.post('/users/:id/cambiarClave', [
-    authenticateAdmin,
-    body('password').notEmpty().withMessage('La nueva clave es obligatoria')
-], usuarioController.changeUserPassword);
-
+const usuariosRoutes = require('./API_Routes/users');
+app.use('/users', usuariosRoutes);
 
 // Configuración de rutas para errores
 app.get('*', function (req, res) {
