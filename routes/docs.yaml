@@ -100,6 +100,41 @@ paths:
           description: Sesión no iniciada
         '500':
           description: Token no valido o usuario no habilitado
+    post:
+      tags:
+        - Sesión
+      summary: Actualiza los datos del usuario actual (Requiere login)
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  required: true
+                  description: Nombre del cliente/usuario
+                apellido:
+                  type: string
+                  required: true
+                  description: Apellido del cliente/usuario
+                email:
+                  type: string
+                  required: true
+                  description: Mail del cliente/usuario
+                telefono:
+                  type: string
+                  required: true
+                  description: Teléfono del cliente/usuario
+      responses:
+        '200':
+          description: Genera el usuario y muestra una confirmación.
+        '400':
+          description: Faltan datos obligatorios
+        '401':
+          description: La sesión no fue iniciada.
+        '500':
+          description: Ya existe un usuario con el mail ingresado | Error al actualizar el usuario
   /products:
     get:
       tags:
@@ -773,15 +808,15 @@ paths:
                 nombre:
                   type: string
                   required: true
-                  description: Nombre del cliente
+                  description: Nombre del cliente/usuario
                 apellido:
                   type: string
                   required: true
-                  description: Apellido del cliente
+                  description: Apellido del cliente/usuario
                 email:
                   type: string
                   required: true
-                  description: Mail del cliente
+                  description: Mail del cliente/usuario
                 password:
                   type: string
                   required: true
@@ -789,7 +824,7 @@ paths:
                 telefono:
                   type: string
                   required: true
-                  description: Teléfono del cliente
+                  description: Teléfono del cliente/usuario
       responses:
         '200':
           description: Genera el usuario y muestra una confirmación.
@@ -927,15 +962,15 @@ paths:
                 nombre:
                   type: string
                   required: true
-                  description: Nombre del cliente
+                  description: Nombre del cliente/usuario
                 apellido:
                   type: string
                   required: true
-                  description: Apellido del cliente
+                  description: Apellido del cliente/usuario
                 email:
                   type: string
                   required: true
-                  description: Mail del cliente
+                  description: Mail del cliente/usuario
                 password:
                   type: string
                   required: true
@@ -943,7 +978,7 @@ paths:
                 telefono:
                   type: string
                   required: true
-                  description: Teléfono del cliente
+                  description: Teléfono del cliente/usuario
                 isAdmin:
                   type: integer
                   required: true

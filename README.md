@@ -7,7 +7,7 @@
 * Node
 * Swagger UI para documentación
 
-### Información sobre instalación:
+### Información sobre instalación, datos de prueba, tests automáticos y documentación de api:
 
 Disponible en https://github.com/francobidart/dsw-tp-backend/blob/main/docs/README.md
 

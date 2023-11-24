@@ -33,11 +33,11 @@ module.exports = {
                     sucursal: pedido.sucursal,
                     montoTotal: montoTotal,
                     medioDePago: pedido.mediodepago
-                })
+                }, {transaction: t})
                 const historialEstado = await HistorialEstadoPedido.create({
                     pedido: nuevoPedido.dataValues.id,
                     estado: 1
-                });
+                }, {transaction: t});
                 for (var j = 0; j < pedido.articulos.length; j++) {
                     let articulo = pedido.articulos[j];
 

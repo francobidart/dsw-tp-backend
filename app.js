@@ -17,7 +17,7 @@ const SucursalController = require('./controllers/SucursalController');
 const PedidosController = require('./controllers/PedidosController');
 const {validarCambioEstadoPedido} = require("./controllers/PedidosController");
 const {Sequelize} = require("sequelize");
-const config = require("./config/config.json");
+const config = require("./config/config.js");
 const swaggerUi = require('swagger-ui-express');
 const swaggerJSDoc = require('swagger-jsdoc');
 const {auth} = require("mysql/lib/protocol/Auth");
@@ -85,6 +85,10 @@ app.use('/products', productosRoutes);
 const categoriasRoutes = require('./API_Routes/categorias');
 app.use('/categories', categoriasRoutes);
 
+
+// Carrito
+
+app.post('/cart/updatePrices', productoController.getByCarrito)
 
 // Sucursales
 

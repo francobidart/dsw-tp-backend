@@ -158,6 +158,7 @@ module.exports = {
     },
 
     async updateUser(req, res) {
+
         const usuarioActual = await Usuarios.findOne({
             where: {
                 id: req.params.id
@@ -328,7 +329,18 @@ module.exports = {
         }
     },
 
-     async updateClient(req, res) {
+    async updateClient(req, res) {
+
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            let errores = '';
+            for (let error of errors.errors) {
+                errores += error.msg + ' / '
+            }
+            return res.status(400).json(errorResponse(errores));
+        }
+
         const usuarioActual = await Usuarios.findOne({
             where: {
                 id: res.locals.user
