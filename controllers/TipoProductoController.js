@@ -29,7 +29,7 @@ module.exports = {
                 res.status(500).send(errorResponse('Ya existe una categoría con nombre: ' + req.body.nombre))
             } else {
                 const tipoProducto = await TipoProducto.create({nombre: req.body.nombre});
-                res.status(200).send(buildResponse(tipoProducto, 'Categoría creada correctamente'));
+                res.status(200).send(buildResponse([tipoProducto], 'Categoría creada correctamente'));
             }
 
         } catch (error) {

@@ -232,12 +232,12 @@ module.exports = {
         });
         if (pedido) {
             if (res.locals.isAdmin) {
-                res.status(200).send(buildResponse(pedido));
+                res.status(200).send(buildResponse([pedido]));
             } else {
                 if (res.locals.user !== pedido.cliente) {
                     res.status(500).send(errorResponse('No autorizado'));
                 } else {
-                    res.status(200).send(buildResponse(pedido));
+                    res.status(200).send(buildResponse([pedido]));
                 }
             }
         } else {

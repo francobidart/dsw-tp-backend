@@ -76,7 +76,7 @@ module.exports = {
         })
             .then(Usuarios => {
                 Usuarios.clave = '';
-                res.status(200).send(buildResponse(Usuarios))
+                res.status(200).send(buildResponse([Usuarios]))
             })
             .catch(error => res.status(400).send(errorResponse(error)))
     },
@@ -319,7 +319,7 @@ module.exports = {
                         }
                     }).then(Usuario => {
                         Usuario.dataValues.clave = null;
-                        res.status(200).send(buildResponse(Usuario.dataValues, 'Consultado correctamente'));
+                        res.status(200).send(buildResponse([Usuario.dataValues], 'Consultado correctamente'));
                     })
                         .catch(error => {
                             res.status(500).json(errorResponse(error.toString()));

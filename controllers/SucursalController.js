@@ -158,7 +158,7 @@ module.exports = {
         })
             .then(Sucursal => {
                 if (Sucursal) {
-                    res.status(200).send(buildResponse(Sucursal))
+                    res.status(200).send(buildResponse([Sucursal]))
                 } else {
                     res.status(404).send(errorResponse('No existe una sucursal con ID: ' + req.params.id))
                 }

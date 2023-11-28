@@ -27,7 +27,8 @@ module.exports = {
         }
 
         const nuevoMedioDePago = await MedioPago.create({
-            nombre: req.body.nombre
+            nombre: req.body.nombre,
+            descripcion: req.body.descripcion
         })
 
         if (nuevoMedioDePago) {
